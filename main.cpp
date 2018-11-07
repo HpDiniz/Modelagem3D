@@ -10,6 +10,8 @@ using namespace std;
 #define LARGURA_JANELA 900
 #define ALTURA_JANELA 700
 
+char nome_arquivo[100];
+
 void contaTriangulos(){}
 
 void calculaFrames(){}
@@ -20,6 +22,28 @@ void criaViewports(){}
 
 void leObj(){
 
+    ifstream arquivo;
+
+	cin >> nome_arquivo;
+
+	arquivo.open(nome_arquivo);
+
+	if(arquivo.fail()){
+		cerr << "Erro ao abrir arquivo." << endl;
+		exit(1);
+	}
+
+	string aux;
+	char tipo;
+
+	while(!arquivo.eof()){
+
+		arquivo>>tipo;
+		if(tipo == 'v')
+		getline(arquivo, aux);
+
+		cout<<aux<<endl;
+	}
 }
 
 void keyboardHandler(unsigned char key, int x, int y){}

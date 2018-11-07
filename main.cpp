@@ -3,6 +3,7 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #include <fstream>
+#include <vector>
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -11,6 +12,14 @@ using namespace std;
 #define ALTURA_JANELA 700
 
 char nome_arquivo[100];
+vector<> vertices;
+GLfloat verticesCB[8][3] = { {-1.0,-1.0,1.0},{-1.0,1.0,1.0},{1.0,1.0,1.0},{1.0,-1.0,1.0},
+{-1.0,-1.0,-1.0},{-1.0,1.0,-1.0},{1.0,1.0,-1.0},{1.0,-1.0,-1.0} };
+GLdouble viewer[] = {2.0, 2.0, 3.0};
+
+//cor de cada face do cubo
+GLfloat colors[6][3] = { {0.0,0.0,0.0} , {1.0,0.0,0.0}, {1.0,1.0,0.0}, {0.0,1.0,0.0},
+{0.0,0.0,1.0} , {1.0,0.0,1.0}};
 
 void contaTriangulos(){}
 
@@ -19,6 +28,39 @@ void calculaFrames(){}
 void submenu(){}
 
 void criaViewports(){}
+
+void desenhaObj() {}
+
+void quad(int a, int b, int c, int d, int ncolor) {
+    glColor3fv(colors[ncolor]);
+    glBegin(GL_QUADS);
+        glVertex3fv(vertices[a]);
+        glVertex3fv(vertices[b]);
+        glVertex3fv(vertices[c]);
+        glVertex3fv(vertices[d]);
+    glEnd();
+}
+
+void tri(int a, int b, int c, int ncolor) {
+    glColor3fv(colors[ncolor]);
+    glBegin(GL_TRIANGLES);
+        glVertex3fv(vertices[a]);
+        glVertex3fv(vertices[b]);
+        glVertex3fv(vertices[c]);
+    glEnd();
+}
+
+//desenha o cubo (faces no sentido anti-horario - face externa)
+void colorcube() {
+
+    // Faces em sentido anti-horario
+    quad(0,3,2,1,0);
+    quad(2,3,7,6,1);
+    quad(0,4,7,3,2);
+    quad(1,2,6,5,3);
+    quad(4,5,6,7,4);
+    quad(0,1,5,4,5);
+}
 
 void leObj(){
 
@@ -34,25 +76,20 @@ void leObj(){
 	}
 
 	string tipo;
-    GLfloat aux;
-	GLfloat aux2;
-	GLfloat aux3;
+    GLfloat x;
+	GLfloat y;
+	GLfloat z;
 
 	while(!arquivo.eof()){
 
 		arquivo>>tipo;
 		if(tipo == "v"){
             //getline(arquivo, aux);
-            arquivo>>aux;
-            arquivo>>aux2;
-            arquivo>>aux3;
-            cout<<tipo<<" "<<aux<<" "<<aux2<<" "<<aux3<<endl;
-            //glColor3fv(1.0,0.0,0.0);
-            //glBegin(GL_TRIANGLES);
-              //  glVertex3fv(aux);
-              //  glVertex3fv(aux2);
-              //  glVertex3fv(aux3);
-           // glEnd();
+            arquivo>>x;
+            arquivo>>y;
+            arquivo>>z;
+            cout<<tipo<<" "<<x<<" "<<y<<" "<<z<<endl;
+            vertices.push(x, y, z);
 
 		}
 
@@ -64,16 +101,29 @@ void keyboardHandler(unsigned char key, int x, int y){}
 
 void mouseHandler(int button, int state, int x, int y){}
 
-void display(){}
+void display(){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
+    glLoadIdentity();
+    gluLookAt(viewer[0],viewer[1],viewer[2], // define posicao do observador
+    0.0, 0.0, 0.0,                           // ponto de interesse (foco)
+    0.0, 1.0, 0.0);                          // vetor de "view up"
+
+    colorcube();
+    desenhaObj();
+
+    glutSwapBuffers();
+}
 
 void init(){
     glClearColor(1.0, 1.0, 1.0, 1.0);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
+    glFrustum(-2.0, 2.0, -2.0, 2.0, 2.0, 20.0);
+    glMatrixMode(GL_MODELVIEW);
+
     criaViewports();
     leObj();
-
 }
 
 int main(int argc, char **argv){

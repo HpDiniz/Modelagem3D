@@ -33,16 +33,30 @@ void leObj(){
 		exit(1);
 	}
 
-	string aux;
-	char tipo;
+	string tipo;
+    GLfloat aux;
+	GLfloat aux2;
+	GLfloat aux3;
 
 	while(!arquivo.eof()){
 
 		arquivo>>tipo;
-		if(tipo == 'v')
-		getline(arquivo, aux);
+		if(tipo == "v"){
+            //getline(arquivo, aux);
+            arquivo>>aux;
+            arquivo>>aux2;
+            arquivo>>aux3;
+            cout<<tipo<<" "<<aux<<" "<<aux2<<" "<<aux3<<endl;
+            //glColor3fv(1.0,0.0,0.0);
+            //glBegin(GL_TRIANGLES);
+              //  glVertex3fv(aux);
+              //  glVertex3fv(aux2);
+              //  glVertex3fv(aux3);
+           // glEnd();
 
-		cout<<aux<<endl;
+		}
+
+		//cout<<aux<<endl;
 	}
 }
 

@@ -13,7 +13,7 @@ using namespace std;
 #define LARGURA_JANELA 900
 #define ALTURA_JANELA 700
 
-char nome_arquivo[100];
+//char nome_arquivo[100];
 vector<vector<GLfloat> > vertices;
 
 GLdouble viewer[] = {20.0, 20.0, 30.0};
@@ -30,10 +30,9 @@ void desenhaMenuLateral(){
     glColor3f(1.0, 0.5, 0.0);
     glBegin(GL_POLYGON);
         glVertex2f(0, 0);
-        glVertex2f(LARGURA_JANELA/3, 0);
-        glVertex2f(LARGURA_JANELA/3, ALTURA_JANELA);
+        glVertex2f(100, 0);
+        glVertex2f(100, ALTURA_JANELA);
         glVertex2f(0, ALTURA_JANELA);
-        glVertex2f(0, 0);
     glEnd();
 }
 
@@ -56,9 +55,9 @@ void leObj(){
 
     ifstream arquivo;
 
-	cin >> nome_arquivo;
-	//string nome = "boneco.obj";
-    //const char * nome_arquivo = nome.c_str();
+	// cin >> nome_arquivo;
+	string nome = "boneco.obj";
+    const char * nome_arquivo = nome.c_str();
 
 	arquivo.open(nome_arquivo);
 
@@ -102,25 +101,27 @@ void mouseHandler(int button, int state, int x, int y){}
 void display(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
     glLoadIdentity();
-
-    glMatrixMode(GL_PROJECTION);
-    glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
-    glLoadIdentity();
     gluLookAt(viewer[0],viewer[1],viewer[2], // define posicao do observador
     0.0, 0.0, 0.0,                           // ponto de interesse (foco)
     0.0, 1.0, 0.0);                          // vetor de "view up"
-    //glOrtho(-100, 100, 0, ALTURA_JANELA, -20, 20);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
     glFrustum(0.0, 1.0, -1.0, 1.0, 1.0, 150.0);
     glMatrixMode(GL_MODELVIEW);
     desenhaObj();
-/*
+
+    gluLookAt(viewer[0],viewer[1],viewer[2], // define posicao do observador
+    0.0, 0.0, 0.0,                           // ponto de interesse (foco)
+    0.0, 0.0, 0.0);                          // vetor de "view up"
     glMatrixMode(GL_PROJECTION);
-    glViewport((LARGURA_JANELA/3)*2, 0, LARGURA_JANELA, ALTURA_JANELA);
     glLoadIdentity();
+    glViewport((LARGURA_JANELA/3)*2, 0, LARGURA_JANELA, ALTURA_JANELA);
     gluOrtho2D(0, LARGURA_JANELA/3, 0, ALTURA_JANELA);
     glMatrixMode(GL_MODELVIEW);
     desenhaMenuLateral();
-*/
+
     glutSwapBuffers();
     glutPostRedisplay();
 }
@@ -151,7 +152,6 @@ void reshape(int x, int y) {
 
 void init(){
     glClearColor(1.0, 1.0, 1.0, 1.0);
-    glEnable(GL_DEPTH_TEST);
     leObj();
     //leVertices();
 }
@@ -160,7 +160,7 @@ int main(int argc, char **argv){
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(LARGURA_JANELA, ALTURA_JANELA);
-    glutInitWindowPosition(5, 5);
+    glutInitWindowPosition(5, 50);
     glutCreateWindow("Blender HD");
     init();
     glutDisplayFunc(display);

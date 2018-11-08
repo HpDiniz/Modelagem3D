@@ -1,9 +1,11 @@
+
 #include <iostream>
 #include <GL/freeglut.h>
 #include <GL/gl.h>
 #include <GL/glut.h>
 #include <fstream>
 #include <vector>
+#include <cstring>
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -11,15 +13,10 @@ using namespace std;
 #define LARGURA_JANELA 900
 #define ALTURA_JANELA 700
 
-char nome_arquivo[100];
-vector<> vertices;
-GLfloat verticesCB[8][3] = { {-1.0,-1.0,1.0},{-1.0,1.0,1.0},{1.0,1.0,1.0},{1.0,-1.0,1.0},
-{-1.0,-1.0,-1.0},{-1.0,1.0,-1.0},{1.0,1.0,-1.0},{1.0,-1.0,-1.0} };
-GLdouble viewer[] = {2.0, 2.0, 3.0};
+//char nome_arquivo[100];
+vector<vector<GLfloat> > vertices;
 
-//cor de cada face do cubo
-GLfloat colors[6][3] = { {0.0,0.0,0.0} , {1.0,0.0,0.0}, {1.0,1.0,0.0}, {0.0,1.0,0.0},
-{0.0,0.0,1.0} , {1.0,0.0,1.0}};
+GLdouble viewer[] = {20.0, 20.0, 30.0};
 
 void contaTriangulos(){}
 
@@ -27,46 +24,40 @@ void calculaFrames(){}
 
 void submenu(){}
 
-void criaViewports(){}
+void desenhaEixos() {}
 
-void desenhaObj() {}
-
-void quad(int a, int b, int c, int d, int ncolor) {
-    glColor3fv(colors[ncolor]);
-    glBegin(GL_QUADS);
-        glVertex3fv(vertices[a]);
-        glVertex3fv(vertices[b]);
-        glVertex3fv(vertices[c]);
-        glVertex3fv(vertices[d]);
+void desenhaMenuLateral(){
+    glColor3f(1.0, 0.5, 0.0);
+    glBegin(GL_POLYGON);
+        glVertex2f(0, 0);
+        glVertex2f(100, 0);
+        glVertex2f(100, ALTURA_JANELA);
+        glVertex2f(0, ALTURA_JANELA);
     glEnd();
 }
 
-void tri(int a, int b, int c, int ncolor) {
-    glColor3fv(colors[ncolor]);
+void tri(int a, int b, int c) {
+    glColor3f(1.0,0.0,0.0);
     glBegin(GL_TRIANGLES);
-        glVertex3fv(vertices[a]);
-        glVertex3fv(vertices[b]);
-        glVertex3fv(vertices[c]);
+        glVertex3f(vertices[a][0],vertices[a][1],vertices[a][2]);
+        glVertex3f(vertices[b][0],vertices[b][1],vertices[b][2]);
+        glVertex3f(vertices[c][0],vertices[c][1],vertices[c][2]);
     glEnd();
 }
 
-//desenha o cubo (faces no sentido anti-horario - face externa)
-void colorcube() {
-
-    // Faces em sentido anti-horario
-    quad(0,3,2,1,0);
-    quad(2,3,7,6,1);
-    quad(0,4,7,3,2);
-    quad(1,2,6,5,3);
-    quad(4,5,6,7,4);
-    quad(0,1,5,4,5);
+void desenhaObj() {
+    for(int i=0; i< vertices.size()-2; i++){
+        tri(i,i+1,i+2);
+    }
 }
 
 void leObj(){
 
     ifstream arquivo;
 
-	cin >> nome_arquivo;
+	// cin >> nome_arquivo;
+	string nome = "boneco.obj";
+    const char * nome_arquivo = nome.c_str();
 
 	arquivo.open(nome_arquivo);
 
@@ -79,6 +70,10 @@ void leObj(){
     GLfloat x;
 	GLfloat y;
 	GLfloat z;
+	vector<GLfloat> ponto;
+    ponto.push_back(0);
+    ponto.push_back(0);
+    ponto.push_back(0);
 
 	while(!arquivo.eof()){
 
@@ -88,16 +83,18 @@ void leObj(){
             arquivo>>x;
             arquivo>>y;
             arquivo>>z;
-            cout<<tipo<<" "<<x<<" "<<y<<" "<<z<<endl;
-            vertices.push(x, y, z);
+
+            ponto[0] = x;
+            ponto[1] = y;
+            ponto[2] = z;
+            //cout<<tipo<<" "<<x<<" "<<y<<" "<<z<<endl;
+            vertices.push_back(ponto);
 
 		}
 
 		//cout<<aux<<endl;
 	}
 }
-
-void keyboardHandler(unsigned char key, int x, int y){}
 
 void mouseHandler(int button, int state, int x, int y){}
 
@@ -108,35 +105,68 @@ void display(){
     0.0, 0.0, 0.0,                           // ponto de interesse (foco)
     0.0, 1.0, 0.0);                          // vetor de "view up"
 
-    colorcube();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
+    glFrustum(0.0, 1.0, -1.0, 1.0, 1.0, 150.0);
+    glMatrixMode(GL_MODELVIEW);
     desenhaObj();
 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glViewport((LARGURA_JANELA/3)*2, 0, LARGURA_JANELA, ALTURA_JANELA);
+    gluOrtho2D(0, LARGURA_JANELA/3, 0, ALTURA_JANELA);
+    glMatrixMode(GL_MODELVIEW);
+    desenhaMenuLateral();
+
     glutSwapBuffers();
+    glutPostRedisplay();
+}
+
+void leVertices(){
+    for(int i=0; i < vertices.size(); i++){
+        cout<<"Ponto["<<i<<"] = ";
+        for(int j=0; j<3; j++)
+            cout<<vertices[i][j]<<" ";
+        cout<< endl;
+    }
+}
+
+void keyboardHandler(unsigned char key, int x, int y){
+    if (key == 27) exit(0); //ESC
+    if (key == 'x') viewer[0] -= 1.0;
+    if (key == 'X') viewer[0] += 1.0;
+    if (key == 'y') viewer[1] -= 1.0;
+    if (key == 'Y') viewer[1] += 1.0;
+    if (key == 'z') viewer[2] -= 1.0;
+    if (key == 'Z') viewer[2] += 1.0;
+    display();
+}
+
+void reshape(int x, int y) {
+    glutInitWindowSize(LARGURA_JANELA, ALTURA_JANELA);
 }
 
 void init(){
     glClearColor(1.0, 1.0, 1.0, 1.0);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    glFrustum(-2.0, 2.0, -2.0, 2.0, 2.0, 20.0);
-    glMatrixMode(GL_MODELVIEW);
-
-    criaViewports();
     leObj();
+    //leVertices();
 }
 
 int main(int argc, char **argv){
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(LARGURA_JANELA, ALTURA_JANELA);
-    glutInitWindowPosition(100, 100);
+    glutInitWindowPosition(5, 50);
     glutCreateWindow("Blender HD");
     init();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboardHandler);
     glutMouseFunc(mouseHandler);
+    glutReshapeFunc(reshape);
 
     glEnable(GL_DEPTH_TEST);
     glutMainLoop();
 }
+
+

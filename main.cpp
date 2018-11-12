@@ -101,20 +101,19 @@ void mouseHandler(int button, int state, int x, int y){}
 void display(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
     glLoadIdentity();
+
+    glMatrixMode(GL_PROJECTION);
+    glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
+    glLoadIdentity();
+    glFrustum(0.0, 1.0, -1.0, 1.0, 1.0, 150.0);
     gluLookAt(viewer[0],viewer[1],viewer[2], // define posicao do observador
     0.0, 0.0, 0.0,                           // ponto de interesse (foco)
     0.0, 1.0, 0.0);                          // vetor de "view up"
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
-    glFrustum(0.0, 1.0, -1.0, 1.0, 1.0, 150.0);
     glMatrixMode(GL_MODELVIEW);
     desenhaObj();
+    glFlush();
 
-    gluLookAt(viewer[0],viewer[1],viewer[2], // define posicao do observador
-    0.0, 0.0, 0.0,                           // ponto de interesse (foco)
-    0.0, 0.0, 0.0);                          // vetor de "view up"
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glViewport((LARGURA_JANELA/3)*2, 0, LARGURA_JANELA, ALTURA_JANELA);
@@ -171,5 +170,4 @@ int main(int argc, char **argv){
     glEnable(GL_DEPTH_TEST);
     glutMainLoop();
 }
-
 

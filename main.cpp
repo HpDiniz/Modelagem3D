@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <GL/freeglut.h>
 #include <GL/gl.h>
@@ -7,6 +6,8 @@
 #include <vector>
 #include <cstring>
 #include <bits/stdc++.h>
+#include <sstream>
+
 
 using namespace std;
 
@@ -21,6 +22,7 @@ using namespace std;
 int objs = 0;
 string nomes[3];
 vector<vector<GLfloat> > vertices;
+const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 
 GLdouble viewer[] = {20.0, 20.0, 30.0};
 
@@ -28,12 +30,25 @@ void contaTriangulos(){}
 
 void calculaFrames(){}
 
+void renderBitmapString(float x, float y, void *font,const char *string){
+    const char *c;
+    glRasterPos2f(x, y);
+
+    for (c=string; *c != '\0'; c++) {
+        glutBitmapCharacter(font, *c);
+    }
+}
+
 void submenu(int x_ini, int y_ini){
     int x = x_ini, y = y_ini;
     int x_inc = 15, x_spacer = 25;
     int y_inc = 40, y_spacer = 55;
     // Escreve nome do arquivo
     // Desenha inputs translação
+    cout << y << endl;
+    glColor3f(0.0, 0.0, 0.0);
+    renderBitmapString(x,y,(void *)font,"Transicao");
+    glColor3f(1.0, 0.5, 0.0);
     for(int j=0; j<=2;j++){
         glBegin(GL_POLYGON);
             glVertex2f(x, y);
@@ -45,9 +60,12 @@ void submenu(int x_ini, int y_ini){
         x += x_spacer;
     }
     x = x_ini;
-    y = y + y_spacer;
 
+    y = y + y_spacer;
     // Desenha inputs rotação
+    glColor3f(0.0, 0.0, 0.0);
+    renderBitmapString(x,y,(void *)font,"Rotacao");
+    glColor3f(1.0, 0.5, 0.0);
     for(int j=0; j<=3;j++){
         glBegin(GL_POLYGON);
             glVertex2f(x, y);
@@ -71,6 +89,8 @@ void submenu(int x_ini, int y_ini){
 
         x += x_spacer;
     }
+
+
 }
 
 void desenhaEixos() {}
@@ -164,8 +184,7 @@ void leObj(){
 	}
 }
 
-void mouseHandler(int button, int state, int x, int y){
-}
+void mouseHandler(int button, int state, int x, int y){}
 
 void display(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
@@ -238,4 +257,3 @@ int main(int argc, char **argv){
     glEnable(GL_DEPTH_TEST);
     glutMainLoop();
 }
-

@@ -12,9 +12,13 @@ using namespace std;
 
 #define LARGURA_JANELA 900
 #define ALTURA_JANELA 700
+#define ESQ_IMPORTAR 5
+#define DIR_IMPORTAR 65
+#define BAIXO_IMPORTAR 10
+#define CIMA_IMPORTAR 50
 
 //char nome_arquivo[100];
-int objs = 2;
+int objs = 0;
 string nomes[3];
 vector<vector<GLfloat> > vertices;
 
@@ -85,10 +89,10 @@ void desenhaMenuLateral(){
     // Desenha input importar
     glColor3f(1.0, 0.0, 1.0);
     glBegin(GL_POLYGON);
-        glVertex2f(5, 10);
-        glVertex2f(65, 10);
-        glVertex2f(65, 50);
-        glVertex2f(5, 50);
+        glVertex2f(ESQ_IMPORTAR, BAIXO_IMPORTAR);
+        glVertex2f(DIR_IMPORTAR, BAIXO_IMPORTAR);
+        glVertex2f(DIR_IMPORTAR, CIMA_IMPORTAR);
+        glVertex2f(ESQ_IMPORTAR, CIMA_IMPORTAR);
     glEnd();
 
     int alt = 80;
@@ -160,7 +164,8 @@ void leObj(){
 	}
 }
 
-void mouseHandler(int button, int state, int x, int y){}
+void mouseHandler(int button, int state, int x, int y){
+}
 
 void display(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
@@ -209,7 +214,7 @@ void keyboardHandler(unsigned char key, int x, int y){
 }
 
 void reshape(int x, int y) {
-    glutInitWindowSize(LARGURA_JANELA, ALTURA_JANELA);
+    glutReshapeWindow(LARGURA_JANELA, ALTURA_JANELA);
 }
 
 void init(){

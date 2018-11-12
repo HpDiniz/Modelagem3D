@@ -14,6 +14,8 @@ using namespace std;
 #define ALTURA_JANELA 700
 
 //char nome_arquivo[100];
+int objs = 0;
+string nomes[3];
 vector<vector<GLfloat> > vertices;
 
 GLdouble viewer[] = {20.0, 20.0, 30.0};
@@ -22,18 +24,54 @@ void contaTriangulos(){}
 
 void calculaFrames(){}
 
-void submenu(){}
+void submenu(int x, int y){
+    int x_inc = 15, x_spacer = 25;
+    int y_inc = 40, y_spacer = 55;
+    // Escreve nome do arquivo
+    // Desenha inputs translação
+    //for(int i=0;i<2;i++){
+        for(int j=0; j<=2;j++){
+            glBegin(GL_POLYGON);
+                glVertex2f(x, y);
+                glVertex2f(x + x_inc, y);
+                glVertex2f(x + x_inc, y + y_inc);
+                glVertex2f(x, y + y_inc);
+            glEnd();
+
+            x += x_spacer;
+        }
+
+        //y += y_spacer;
+   // }
+
+}
 
 void desenhaEixos() {}
 
 void desenhaMenuLateral(){
     glColor3f(1.0, 0.5, 0.0);
+    /*
     glBegin(GL_POLYGON);
         glVertex2f(0, 0);
         glVertex2f(100, 0);
         glVertex2f(100, ALTURA_JANELA);
         glVertex2f(0, ALTURA_JANELA);
     glEnd();
+    */
+
+    // Desenha input importar
+    glColor3f(1.0, 0.0, 1.0);
+    glBegin(GL_POLYGON);
+        glVertex2f(5, 10);
+        glVertex2f(75, 10);
+        glVertex2f(75, 50);
+        glVertex2f(5, 50);
+    glEnd();
+
+    for(int i=0;i<objs;i++){
+        cout << objs << endl;
+        submenu(5, 80);
+    }
 }
 
 void tri(int a, int b, int c) {
@@ -60,8 +98,10 @@ void leObj(){
     const char * nome_arquivo = nome.c_str();
 
 	arquivo.open(nome_arquivo);
+	objs++;
 
 	if(arquivo.fail()){
+        objs--;
 		cerr << "Erro ao abrir arquivo." << endl;
 		exit(1);
 	}
@@ -109,7 +149,6 @@ void display(){
     gluLookAt(viewer[0],viewer[1],viewer[2], // define posicao do observador
     0.0, 0.0, 0.0,                           // ponto de interesse (foco)
     0.0, 1.0, 0.0);                          // vetor de "view up"
-
     glMatrixMode(GL_MODELVIEW);
     desenhaObj();
     glFlush();
@@ -117,7 +156,7 @@ void display(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glViewport((LARGURA_JANELA/3)*2, 0, LARGURA_JANELA, ALTURA_JANELA);
-    gluOrtho2D(0, LARGURA_JANELA/3, 0, ALTURA_JANELA);
+    gluOrtho2D(0, LARGURA_JANELA/3, ALTURA_JANELA, 0);
     glMatrixMode(GL_MODELVIEW);
     desenhaMenuLateral();
 

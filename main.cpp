@@ -24,25 +24,52 @@ void contaTriangulos(){}
 
 void calculaFrames(){}
 
-void submenu(int x, int y){
+void submenu(int x_ini, int y_ini){
+    int x = x_ini, y = y_ini;
     int x_inc = 15, x_spacer = 25;
     int y_inc = 40, y_spacer = 55;
     // Escreve nome do arquivo
     // Desenha inputs translação
-    //for(int i=0;i<2;i++){
-        for(int j=0; j<=2;j++){
-            glBegin(GL_POLYGON);
-                glVertex2f(x, y);
-                glVertex2f(x + x_inc, y);
-                glVertex2f(x + x_inc, y + y_inc);
-                glVertex2f(x, y + y_inc);
-            glEnd();
+    cout << y << endl;
+    for(int j=0; j<=2;j++){
+        glBegin(GL_POLYGON);
+            glVertex2f(x, y);
+            glVertex2f(x + x_inc, y);
+            glVertex2f(x + x_inc, y + y_inc);
+            glVertex2f(x, y + y_inc);
+        glEnd();
 
-            x += x_spacer;
-        }
+        x += x_spacer;
+    }
+    x = x_ini;
+    y = y + y_spacer;
+    cout << y << endl;
 
-        //y += y_spacer;
-   // }
+    // Desenha inputs rotação
+    for(int j=0; j<=3;j++){
+        glBegin(GL_POLYGON);
+            glVertex2f(x, y);
+            glVertex2f(x + x_inc, y);
+            glVertex2f(x + x_inc, y + y_inc);
+            glVertex2f(x, y + y_inc);
+        glEnd();
+
+        x += x_spacer;
+    }
+    x = x_ini;
+    y = y + y_spacer;
+    cout << y << endl;
+    // Desenha inputs escala
+    for(int j=0; j<=2;j++){
+        glBegin(GL_POLYGON);
+            glVertex2f(x, y);
+            glVertex2f(x + x_inc, y);
+            glVertex2f(x + x_inc, y + y_inc);
+            glVertex2f(x, y + y_inc);
+        glEnd();
+
+        x += x_spacer;
+    }
 
 }
 

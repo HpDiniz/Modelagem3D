@@ -14,7 +14,7 @@ using namespace std;
 #define ALTURA_JANELA 700
 
 //char nome_arquivo[100];
-int objs = 0;
+int objs = 2;
 string nomes[3];
 vector<vector<GLfloat> > vertices;
 
@@ -30,7 +30,6 @@ void submenu(int x_ini, int y_ini){
     int y_inc = 40, y_spacer = 55;
     // Escreve nome do arquivo
     // Desenha inputs translação
-    cout << y << endl;
     for(int j=0; j<=2;j++){
         glBegin(GL_POLYGON);
             glVertex2f(x, y);
@@ -43,7 +42,6 @@ void submenu(int x_ini, int y_ini){
     }
     x = x_ini;
     y = y + y_spacer;
-    cout << y << endl;
 
     // Desenha inputs rotação
     for(int j=0; j<=3;j++){
@@ -58,7 +56,6 @@ void submenu(int x_ini, int y_ini){
     }
     x = x_ini;
     y = y + y_spacer;
-    cout << y << endl;
     // Desenha inputs escala
     for(int j=0; j<=2;j++){
         glBegin(GL_POLYGON);
@@ -70,7 +67,6 @@ void submenu(int x_ini, int y_ini){
 
         x += x_spacer;
     }
-
 }
 
 void desenhaEixos() {}
@@ -90,14 +86,15 @@ void desenhaMenuLateral(){
     glColor3f(1.0, 0.0, 1.0);
     glBegin(GL_POLYGON);
         glVertex2f(5, 10);
-        glVertex2f(75, 10);
-        glVertex2f(75, 50);
+        glVertex2f(65, 10);
+        glVertex2f(65, 50);
         glVertex2f(5, 50);
     glEnd();
 
+    int alt = 80;
     for(int i=0;i<objs;i++){
         cout << objs << endl;
-        submenu(5, 80);
+        submenu(5, alt+(180*i));
     }
 }
 

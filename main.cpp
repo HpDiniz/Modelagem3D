@@ -20,7 +20,12 @@ using namespace std;
 
 //char nome_arquivo[100];
 int objs = 0;
+string nomeArq;
 string nomes[3];
+unsigned short int arq = 0;
+bool ClickImport = false;
+bool enviar = false;
+bool nomeValido = false;
 vector<vector<GLfloat> > vertices;
 const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 
@@ -45,9 +50,9 @@ void submenu(int x_ini, int y_ini){
     int y_inc = 40, y_spacer = 55;
     // Escreve nome do arquivo
     // Desenha inputs translação
-    cout << y << endl;
+   // cout << y << endl;
     glColor3f(0.0, 0.0, 0.0);
-    renderBitmapString(x,y,(void *)font,"Transicao");
+    renderBitmapString(x,y,(void *)font,"Translacao");
     glColor3f(1.0, 0.5, 0.0);
     for(int j=0; j<=2;j++){
         glBegin(GL_POLYGON);
@@ -110,17 +115,32 @@ void desenhaMenuLateral(){
     */
 
     // Desenha input importar
-    glColor3f(1.0, 0.0, 1.0);
+    glColor3f(0.0, 0.0, 0.0);
+    std::stringstream ss; //from
+    ss << nomes[arq];
+    std::string s = ss.str ();
+    char* char_type = (char*) s.c_str();
+    renderBitmapString(ESQ_IMPORTAR+ESQ_IMPORTAR/2,CIMA_IMPORTAR-CIMA_IMPORTAR/3,(void *)font,char_type);
+    glColor3f(1.0, 0.5, 0.0);
     glBegin(GL_POLYGON);
         glVertex2f(ESQ_IMPORTAR, BAIXO_IMPORTAR);
         glVertex2f(DIR_IMPORTAR, BAIXO_IMPORTAR);
         glVertex2f(DIR_IMPORTAR, CIMA_IMPORTAR);
         glVertex2f(ESQ_IMPORTAR, CIMA_IMPORTAR);
     glEnd();
+    glColor3f(0.0, 0.0, 0.0);
+    renderBitmapString(DIR_IMPORTAR+6,CIMA_IMPORTAR-CIMA_IMPORTAR/3,(void *)font,"Import");
+     glColor3f(0.0, 0.5, 0.0);
+    glBegin(GL_POLYGON);
+        glVertex2f(DIR_IMPORTAR+3, BAIXO_IMPORTAR);
+        glVertex2f(DIR_IMPORTAR+32, BAIXO_IMPORTAR);
+        glVertex2f(DIR_IMPORTAR+32, CIMA_IMPORTAR);
+        glVertex2f(DIR_IMPORTAR+3, CIMA_IMPORTAR);
+    glEnd();
 
     int alt = 80;
     for(int i=0;i<objs;i++){
-        cout << objs << endl;
+        //cout << objs << endl;
         submenu(5, alt+(180*i));
     }
 }
@@ -187,7 +207,22 @@ void leObj(){
 	}
 }
 
-void mouseHandler(int button, int state, int x, int y){}
+void mouseHandler(int button, int state, int x, int y){
+    if( x > LARGURA_JANELA - LARGURA_JANELA/3){
+        cout<< "Cliquei em " << x << " " << y << endl;
+        ClickImport = true;
+        cout<< DIR_IMPORTAR+3 << endl;
+        if(x> 804 && x<890 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR){
+            if(nomeValido == true){
+                nomeValido == false;
+                arq ++;
+            }
+        }
+    }
+    else
+        ClickImport = false;
+
+}
 
 void display(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
@@ -226,12 +261,42 @@ void leVertices(){
 
 void keyboardHandler(unsigned char key, int x, int y){
     if (key == 27) exit(0); //ESC
-    if (key == 'x') viewer[0] -= 1.0;
-    if (key == 'X') viewer[0] += 1.0;
-    if (key == 'y') viewer[1] -= 1.0;
-    if (key == 'Y') viewer[1] += 1.0;
-    if (key == 'z') viewer[2] -= 1.0;
-    if (key == 'Z') viewer[2] += 1.0;
+
+    if(arq>0){
+        for(int i =0; i<arq; i++)
+            cout<<i<<": "<< nomes[i] << " ";
+        cout<<endl;
+    }
+
+    if(arq < 3){ //IMPEDIR USUARIO MANDAR MAIS DE 3 ARQUIVOS
+        if(ClickImport == true){
+            string aux;
+            aux = key;
+            if( nomes[arq].size() > 4 && nomes[arq][nomes[arq].size() - 3] == '.' && nomes[arq][nomes[arq].size() - 2] == 'o' && nomes[arq][nomes[arq].size() -1] == 'b'){
+                if(nomeValido == false){
+                    if(key == 'j'){
+                        //nomeArq = nomeArq + aux;
+                        nomes[arq] = nomes[arq] + aux;
+                        nomeValido = true;
+                        cout<< nomes[arq] <<" E UM .OBJ" << endl;
+                    }
+                }
+            }
+            else{
+                cout<< "nomes[arq] " << nomes[arq] << endl;
+                nomes[arq] = nomes[arq] + aux;
+            }
+            cout<< "Meu nome eh: " <<nomes[arq] << endl;
+        }
+    }
+    else{
+        if (key == 'x') viewer[0] -= 1.0;
+        if (key == 'X') viewer[0] += 1.0;
+        if (key == 'y') viewer[1] -= 1.0;
+        if (key == 'Y') viewer[1] += 1.0;
+        if (key == 'z') viewer[2] -= 1.0;
+        if (key == 'Z') viewer[2] += 1.0;
+    }
     display();
 }
 

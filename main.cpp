@@ -47,7 +47,7 @@ void submenu(int x_ini, int y_ini){
     // Desenha inputs translação
     cout << y << endl;
     glColor3f(0.0, 0.0, 0.0);
-    renderBitmapString(x,y,(void *)font,"Transsicao");
+    renderBitmapString(x,y,(void *)font,"Transicao");
     glColor3f(1.0, 0.5, 0.0);
     for(int j=0; j<=2;j++){
         glBegin(GL_POLYGON);
@@ -78,6 +78,9 @@ void submenu(int x_ini, int y_ini){
     }
     x = x_ini;
     y = y + y_spacer;
+    glColor3f(0.0, 0.0, 0.0);
+    renderBitmapString(x,y,(void *)font,"Escala");
+    glColor3f(1.0, 0.5, 0.0);
     // Desenha inputs escala
     for(int j=0; j<=2;j++){
         glBegin(GL_POLYGON);

@@ -7,7 +7,8 @@
 #include <cstring>
 #include <bits/stdc++.h>
 #include <sstream>
-
+#include <string>
+#include <iomanip>
 
 using namespace std;
 
@@ -18,10 +19,24 @@ using namespace std;
 #define BAIXO_IMPORTAR 10
 #define CIMA_IMPORTAR 50
 
-//char nome_arquivo[100];
+class objeto{
+public:
+    string nome;
+    float transX, transY, transZ;
+    float scaleX, scaleY, scaleZ;
+    float rotX, rotY, rotZ, rotAngle;
+
+    objeto(){
+        nome = "";
+        transX = 1.1; transY = 1.2; transZ = 1.3;
+        scaleX = 3.1; scaleY = 3.2; scaleZ = 3.3;
+        rotX = 2.1; rotY = 2.2; rotZ = 2.3; rotAngle = 0.5;
+    }
+};
+
 int objs = 0;
 string nomeArq;
-string nomes[3];
+objeto obj[3];
 bool importado[3];
 unsigned short int arq = 0;
 bool ClickImport = false;
@@ -36,6 +51,7 @@ vector<vector<int> > faces3;
 const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 
 GLdouble viewer[] = {20.0, 20.0, 30.0};
+
 
 void contaTriangulos(){}
 
@@ -52,19 +68,36 @@ void renderBitmapString(float x, float y, void *font,const char *string){
 
 void submenu(int x_ini, int y_ini, int index){
     int x = x_ini, y = y_ini;
-    int x_inc = 15, x_spacer = 25;
+    int x_inc = 15, x_spacer = 20;
     int y_inc = 28, y_spacer = 55;
 
-    std::stringstream ss; //from
-    ss << nomes[index];
-    std::string s = ss.str ();
+    stringstream ss; //from
+    ss << obj[index].nome;
+    string s = ss.str ();
     char* char_type = (char*) s.c_str();
     glColor3f(1.0, 0.0, 0.4);
     renderBitmapString(x,y-33,(void *)font,char_type);
     glColor3f(0.0, 0.0, 0.0);
     renderBitmapString(x,y-5,(void *)font,"Translacao");
-    glColor3f(1.0, 1.0, 1.0);
     for(int j=0; j<=2;j++){
+
+        glColor3f(0.0, 0.0, 0.0);
+        stringstream ss;
+
+       // cout<< setprecision(1) << obj[index].transX << fixed <<endl;
+
+        if(j == 0)
+            ss <<obj[index].transX;
+        else if(j == 1)
+            ss << obj[index].transY;
+        else if(j == 2)
+            ss << obj[index].transZ;
+
+        std::string s = ss.str ();
+        char* char_type = (char*) s.c_str();
+        renderBitmapString(x+2,y+y_inc-4,(void *)font,char_type);
+
+        glColor3f(1.0, 1.0, 1.0);
         glBegin(GL_POLYGON);
             glVertex2f(x, y);
             glVertex2f(x + x_inc, y);
@@ -74,6 +107,7 @@ void submenu(int x_ini, int y_ini, int index){
 
         x += x_spacer;
     }
+
     x = x_ini;
 
     y = y + y_spacer;
@@ -82,6 +116,24 @@ void submenu(int x_ini, int y_ini, int index){
     renderBitmapString(x,y-5,(void *)font,"Rotacao");
     glColor3f(1.0, 1.0, 1.0);
     for(int j=0; j<=3;j++){
+
+        glColor3f(0.0, 0.0, 0.0);
+        stringstream ss;
+
+        if(j == 0)
+            ss << obj[index].rotAngle;
+        else if(j == 1)
+            ss << obj[index].rotX;
+        else if(j == 2)
+            ss << obj[index].rotY;
+        else if(j == 3)
+            ss << obj[index].rotZ;
+
+        std::string s = ss.str ();
+        char* char_type = (char*) s.c_str();
+        renderBitmapString(x+2,y+y_inc-4,(void *)font,char_type);
+
+        glColor3f(1.0, 1.0, 1.0);
         glBegin(GL_POLYGON);
             glVertex2f(x, y);
             glVertex2f(x + x_inc, y);
@@ -98,6 +150,23 @@ void submenu(int x_ini, int y_ini, int index){
     glColor3f(1.0, 1.0, 1.0);
     // Desenha inputs escala
     for(int j=0; j<=2;j++){
+
+        glColor3f(0.0, 0.0, 0.0);
+        stringstream ss;
+
+        if(j == 0)
+            ss << obj[index].scaleX;
+        else if(j == 1)
+            ss << obj[index].scaleY;
+        else if(j == 2)
+            ss << obj[index].scaleZ;
+
+        std::string s = ss.str ();
+        char* char_type = (char*) s.c_str();
+        renderBitmapString(x+2,y+y_inc-4,(void *)font,char_type);
+
+        glColor3f(1.0, 1.0, 1.0);
+
         glBegin(GL_POLYGON);
             glVertex2f(x, y);
             glVertex2f(x + x_inc, y);
@@ -118,7 +187,7 @@ void desenhaMenuLateral(){
     // Desenha input importar
     glColor3f(0.0, 0.0, 0.0);
     std::stringstream ss; //from
-    ss << nomes[arq];
+    ss << obj[arq].nome;
     std::string s = ss.str ();
     char* char_type = (char*) s.c_str();
     renderBitmapString(ESQ_IMPORTAR+ESQ_IMPORTAR/2,CIMA_IMPORTAR-CIMA_IMPORTAR/3,(void *)font,char_type);
@@ -237,19 +306,19 @@ void leObj(string nome){
 		}
 		else if(tipo == "f"){
             arquivo>>v1;
-            cout << "vertice: " << v1;
+           // cout << "vertice: " << v1;
             arquivo>>barra;
             arquivo>>ignora;
             arquivo>>barra;
             arquivo>>ignora;
             arquivo>>v2;
-            cout << "vertice: " << v2;
+            //cout << "vertice: " << v2;
             arquivo>>barra;
             arquivo>>ignora;
             arquivo>>barra;
             arquivo>>ignora;
             arquivo>>v3;
-            cout << "vertice: " << v3;
+           // cout << "vertice: " << v3;
             arquivo>>barra;
             arquivo>>ignora;
             arquivo>>barra;
@@ -259,7 +328,7 @@ void leObj(string nome){
             face[1] = v2;
             face[2] = v3;
 
-            cout << "face: " << face[0] << ' ' << face[1] << ' ' << face[2] << endl;
+            //cout << "face: " << face[0] << ' ' << face[1] << ' ' << face[2] << endl;
     /*
             if(arq == 0)
                 faces.push_back(face);
@@ -284,7 +353,8 @@ void mouseHandler(int button, int state, int x, int y){
                 cout<< DIR_IMPORTAR+3 << endl;
                 if(arq < 3) {
                     if(x> 804 && x<890 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR){
-                        leObj(nomes[arq]);
+                        leObj(obj[arq].nome);
+                        obj[arq].nome = obj[arq].nome;
                         importado[arq] = true;
                         arq ++;
                         cout << arq << endl;
@@ -342,7 +412,7 @@ void keyboardHandler(unsigned char key, int x, int y){
 
     if(arq>0){
         for(int i=0; i<arq; i++)
-            cout<<i<<": "<< nomes[i] << " ";
+            cout<<i<<": "<< obj[i].nome << " ";
         cout<<endl;
     }
 
@@ -351,10 +421,10 @@ void keyboardHandler(unsigned char key, int x, int y){
             if((int)key == 46 || ((int)key >= 65 && (int)key <= 90 ) || ((int)key >= 97 && (int)key <= 122 ) || ((int)key >= 48 && (int)key <= 57 )){ //Codigo ASCII apenas de letras e numeros
                 string aux;
                 aux = key;
-                nomes[arq] = nomes[arq] + aux;
+                obj[arq].nome = obj[arq].nome + aux;
             }
-            else if( (int)key == 8 && nomes[arq].size()>0){ // CODIGO ASCII 8 DO BOTÃO BACKSPACE
-                nomes[arq].erase(nomes[arq].size()-1); // APAGA ULTIMO CARACTERE DA STRIING
+            else if( (int)key == 8 && obj[arq].nome.size()>0){ // CODIGO ASCII 8 DO BOTÃO BACKSPACE
+                obj[arq].nome.erase(obj[arq].nome.size()-1); // APAGA ULTIMO CARACTERE DA STRIING
             }
         }
     }

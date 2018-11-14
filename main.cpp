@@ -28,6 +28,8 @@ bool ClickImport = false;
 bool enviar = false;
 bool nomeValido = false;
 vector<vector<GLfloat> > vertices;
+vector<vector<GLfloat> > vertices2;
+vector<vector<GLfloat> > vertices3;
 const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 
 GLdouble viewer[] = {20.0, 20.0, 30.0};
@@ -155,19 +157,31 @@ void tri(int a, int b, int c) {
     glEnd();
 }
 
-void desenhaObj() {
-    for(int i=0; i< vertices.size()-2; i++){
-        tri(i,i+1,i+2);
+void desenhaObj(int x) {
+    if(x == 0){
+        for(int i=0; i< vertices.size()-2; i++){
+            tri(i,i+1,i+2);
+        }
+    }
+    else if(x == 1){
+        for(int i=0; i< vertices2.size()-2; i++){
+            tri(i,i+1,i+2);
+        }
+    }
+    else if(x == 2){
+        for(int i=0; i< vertices3.size()-2; i++){
+            tri(i,i+1,i+2);
+        }
     }
 }
 
-void leObj(){
+void leObj(string nome){
 
 
     ifstream arquivo;
 
 	// cin >> nome_arquivo;
-	string nome = "boneco.obj";
+	//string nome = "boneco.obj";
     const char * nome_arquivo = nome.c_str();
 
 	arquivo.open(nome_arquivo);
@@ -201,7 +215,12 @@ void leObj(){
             ponto[1] = y;
             ponto[2] = z;
             //cout<<tipo<<" "<<x<<" "<<y<<" "<<z<<endl;
-            vertices.push_back(ponto);
+            if(arq == 0)
+                vertices.push_back(ponto);
+            else if(arq == 1)
+                vertices2.push_back(ponto);
+            else if(arq == 2)
+                vertices3.push_back(ponto);
 
 		}
 
@@ -217,9 +236,11 @@ void mouseHandler(int button, int state, int x, int y){
                 ClickImport = true;
                 cout<< DIR_IMPORTAR+3 << endl;
                 if(arq < 3) {
-                    if(x> 804 && x<890 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR)
+                    if(x> 804 && x<890 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR){
+                        leObj(nomes[arq]);
                         importado[arq] = true;
                         arq ++;
+                    }
                 }
             }
             else
@@ -240,7 +261,10 @@ void display(){
     0.0, 0.0, 0.0,                           // ponto de interesse (foco)
     0.0, 1.0, 0.0);                          // vetor de "view up"
     glMatrixMode(GL_MODELVIEW);
-    desenhaObj();
+    for(int i=0; i<arq; i++){
+        if(importado[i] == true)
+            desenhaObj(i);
+    }
     glFlush();
 
     glMatrixMode(GL_PROJECTION);
@@ -266,18 +290,25 @@ void leVertices(){
 void keyboardHandler(unsigned char key, int x, int y){
     if (key == 27) exit(0); //ESC
 
+    cout<< "ASCII de "<<key<< ": "<<(int)key << endl;
+
     if(arq>0){
-        for(int i =0; i<arq; i++)
+        for(int i=0; i<arq; i++)
             cout<<i<<": "<< nomes[i] << " ";
         cout<<endl;
     }
 
-    if(ClickImport == true){ //IMPEDIR USUARIO MANDAR MAIS DE 3 ARQUIVOS
-        if(arq < 3){
-            string aux;
-            aux = key;
+    if(ClickImport == true){
+        if(arq < 3){ //IMPEDIR USUARIO MANDAR MAIS DE 3 ARQUIVOS
+            if((int)key == 46 || ((int)key >= 65 && (int)key <= 90 ) || ((int)key >= 97 && (int)key <= 122 ) || ((int)key >= 48 && (int)key <= 57 )){ //Codigo ASCII apenas de letras e numeros
+                string aux;
+                aux = key;
                 nomes[arq] = nomes[arq] + aux;
             }
+            else if( (int)key == 8 && nomes[arq].size()>0){ // CODIGO ASCII 8 DO BOTÃO BACKSPACE
+                nomes[arq].erase(nomes[arq].size()-1); // APAGA ULTIMO CARACTERE DA STRIING
+            }
+        }
     }
     else{
         if (key == 'x') viewer[0] -= 1.0;
@@ -298,7 +329,6 @@ void init(){
     for(int i=0; i<3; i++)
         importado[i] = false;
     glClearColor(1.0, 1.0, 1.0, 1.0);
-    leObj();
     //leVertices();
 }
 

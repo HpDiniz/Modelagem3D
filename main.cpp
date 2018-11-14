@@ -47,16 +47,20 @@ void renderBitmapString(float x, float y, void *font,const char *string){
     }
 }
 
-void submenu(int x_ini, int y_ini){
+void submenu(int x_ini, int y_ini, int index){
     int x = x_ini, y = y_ini;
     int x_inc = 15, x_spacer = 25;
-    int y_inc = 40, y_spacer = 55;
-    // Escreve nome do arquivo
-    // Desenha inputs translação
-   // cout << y << endl;
+    int y_inc = 28, y_spacer = 55;
+
+    std::stringstream ss; //from
+    ss << nomes[index];
+    std::string s = ss.str ();
+    char* char_type = (char*) s.c_str();
+    glColor3f(1.0, 0.0, 0.4);
+    renderBitmapString(x,y-33,(void *)font,char_type);
     glColor3f(0.0, 0.0, 0.0);
-    renderBitmapString(x,y,(void *)font,"Translacao");
-    glColor3f(1.0, 0.5, 0.0);
+    renderBitmapString(x,y-5,(void *)font,"Translacao");
+    glColor3f(1.0, 1.0, 1.0);
     for(int j=0; j<=2;j++){
         glBegin(GL_POLYGON);
             glVertex2f(x, y);
@@ -72,8 +76,8 @@ void submenu(int x_ini, int y_ini){
     y = y + y_spacer;
     // Desenha inputs rotação
     glColor3f(0.0, 0.0, 0.0);
-    renderBitmapString(x,y,(void *)font,"Rotacao");
-    glColor3f(1.0, 0.5, 0.0);
+    renderBitmapString(x,y-5,(void *)font,"Rotacao");
+    glColor3f(1.0, 1.0, 1.0);
     for(int j=0; j<=3;j++){
         glBegin(GL_POLYGON);
             glVertex2f(x, y);
@@ -87,8 +91,8 @@ void submenu(int x_ini, int y_ini){
     x = x_ini;
     y = y + y_spacer;
     glColor3f(0.0, 0.0, 0.0);
-    renderBitmapString(x,y,(void *)font,"Escala");
-    glColor3f(1.0, 0.5, 0.0);
+    renderBitmapString(x,y-5,(void *)font,"Escala");
+    glColor3f(1.0, 1.0, 1.0);
     // Desenha inputs escala
     for(int j=0; j<=2;j++){
         glBegin(GL_POLYGON);
@@ -107,15 +111,6 @@ void submenu(int x_ini, int y_ini){
 void desenhaEixos() {}
 
 void desenhaMenuLateral(){
-    glColor3f(1.0, 0.5, 0.0);
-    /*
-    glBegin(GL_POLYGON);
-        glVertex2f(0, 0);
-        glVertex2f(100, 0);
-        glVertex2f(100, ALTURA_JANELA);
-        glVertex2f(0, ALTURA_JANELA);
-    glEnd();
-    */
 
     // Desenha input importar
     glColor3f(0.0, 0.0, 0.0);
@@ -124,28 +119,36 @@ void desenhaMenuLateral(){
     std::string s = ss.str ();
     char* char_type = (char*) s.c_str();
     renderBitmapString(ESQ_IMPORTAR+ESQ_IMPORTAR/2,CIMA_IMPORTAR-CIMA_IMPORTAR/3,(void *)font,char_type);
-    glColor3f(1.0, 0.5, 0.0);
+    glColor3f(1.0, 1.0, 1.0);
     glBegin(GL_POLYGON);
         glVertex2f(ESQ_IMPORTAR, BAIXO_IMPORTAR);
         glVertex2f(DIR_IMPORTAR, BAIXO_IMPORTAR);
-        glVertex2f(DIR_IMPORTAR, CIMA_IMPORTAR);
-        glVertex2f(ESQ_IMPORTAR, CIMA_IMPORTAR);
+        glVertex2f(DIR_IMPORTAR, CIMA_IMPORTAR-8);
+        glVertex2f(ESQ_IMPORTAR, CIMA_IMPORTAR-8);
     glEnd();
     glColor3f(0.0, 0.0, 0.0);
     renderBitmapString(DIR_IMPORTAR+6,CIMA_IMPORTAR-CIMA_IMPORTAR/3,(void *)font,"Import");
-     glColor3f(0.0, 0.5, 0.0);
+     glColor3f(1.0, 1.0, 1.0);
     glBegin(GL_POLYGON);
         glVertex2f(DIR_IMPORTAR+3, BAIXO_IMPORTAR);
         glVertex2f(DIR_IMPORTAR+32, BAIXO_IMPORTAR);
-        glVertex2f(DIR_IMPORTAR+32, CIMA_IMPORTAR);
-        glVertex2f(DIR_IMPORTAR+3, CIMA_IMPORTAR);
+        glVertex2f(DIR_IMPORTAR+32, CIMA_IMPORTAR-8);
+        glVertex2f(DIR_IMPORTAR+3, CIMA_IMPORTAR-8);
     glEnd();
 
     int alt = 80;
     for(int i=0;i<objs;i++){
-        //cout << objs << endl;
-        submenu(5, alt+(180*i));
+        submenu(5, alt+25+(210*i), i);
     }
+
+    glColor3f(0.4, 0.8, 0.4);
+
+    glBegin(GL_POLYGON);
+        glVertex2f(0, 0);
+        glVertex2f(100, 0);
+        glVertex2f(100, ALTURA_JANELA);
+        glVertex2f(0, ALTURA_JANELA);
+    glEnd();
 }
 
 void tri(int a, int b, int c) {

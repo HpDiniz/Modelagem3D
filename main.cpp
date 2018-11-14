@@ -22,6 +22,7 @@ using namespace std;
 int objs = 0;
 string nomeArq;
 string nomes[3];
+bool importado[3];
 unsigned short int arq = 0;
 bool ClickImport = false;
 bool enviar = false;
@@ -162,6 +163,7 @@ void desenhaObj() {
 
 void leObj(){
 
+
     ifstream arquivo;
 
 	// cin >> nome_arquivo;
@@ -208,20 +210,22 @@ void leObj(){
 }
 
 void mouseHandler(int button, int state, int x, int y){
-    if( x > LARGURA_JANELA - LARGURA_JANELA/3){
-        cout<< "Cliquei em " << x << " " << y << endl;
-        ClickImport = true;
-        cout<< DIR_IMPORTAR+3 << endl;
-        if(x> 804 && x<890 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR){
-            if(nomeValido == true){
-                nomeValido == false;
-                arq ++;
+    if (button == GLUT_LEFT_BUTTON){
+        if (state == GLUT_DOWN) {
+            if( x > LARGURA_JANELA - LARGURA_JANELA/3){
+                cout<< "Cliquei em " << x << " " << y << endl;
+                ClickImport = true;
+                cout<< DIR_IMPORTAR+3 << endl;
+                if(arq < 3) {
+                    if(x> 804 && x<890 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR)
+                        importado[arq] = true;
+                        arq ++;
+                }
             }
+            else
+                ClickImport = false;
         }
     }
-    else
-        ClickImport = false;
-
 }
 
 void display(){
@@ -268,26 +272,12 @@ void keyboardHandler(unsigned char key, int x, int y){
         cout<<endl;
     }
 
-    if(arq < 3){ //IMPEDIR USUARIO MANDAR MAIS DE 3 ARQUIVOS
-        if(ClickImport == true){
+    if(ClickImport == true){ //IMPEDIR USUARIO MANDAR MAIS DE 3 ARQUIVOS
+        if(arq < 3){
             string aux;
             aux = key;
-            if( nomes[arq].size() > 4 && nomes[arq][nomes[arq].size() - 3] == '.' && nomes[arq][nomes[arq].size() - 2] == 'o' && nomes[arq][nomes[arq].size() -1] == 'b'){
-                if(nomeValido == false){
-                    if(key == 'j'){
-                        //nomeArq = nomeArq + aux;
-                        nomes[arq] = nomes[arq] + aux;
-                        nomeValido = true;
-                        cout<< nomes[arq] <<" E UM .OBJ" << endl;
-                    }
-                }
-            }
-            else{
-                cout<< "nomes[arq] " << nomes[arq] << endl;
                 nomes[arq] = nomes[arq] + aux;
             }
-            cout<< "Meu nome eh: " <<nomes[arq] << endl;
-        }
     }
     else{
         if (key == 'x') viewer[0] -= 1.0;
@@ -305,6 +295,8 @@ void reshape(int x, int y) {
 }
 
 void init(){
+    for(int i=0; i<3; i++)
+        importado[i] = false;
     glClearColor(1.0, 1.0, 1.0, 1.0);
     leObj();
     //leVertices();

@@ -30,6 +30,9 @@ bool nomeValido = false;
 vector<vector<GLfloat> > vertices;
 vector<vector<GLfloat> > vertices2;
 vector<vector<GLfloat> > vertices3;
+vector<vector<int> > faces;
+vector<vector<int> > faces2;
+vector<vector<int> > faces3;
 const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 
 GLdouble viewer[] = {20.0, 20.0, 30.0};
@@ -204,6 +207,12 @@ void leObj(string nome){
     ponto.push_back(0);
     ponto.push_back(0);
     ponto.push_back(0);
+    vector<int> face;
+    face.push_back(0);
+    face.push_back(0);
+    face.push_back(0);
+    int v1, v2, v3, ignora;
+    char barra;
 
 	while(!arquivo.eof()){
 
@@ -226,9 +235,44 @@ void leObj(string nome){
                 vertices3.push_back(ponto);
 
 		}
+		else if(tipo == "f"){
+            arquivo>>v1;
+            cout << "vertice: " << v1;
+            arquivo>>barra;
+            arquivo>>ignora;
+            arquivo>>barra;
+            arquivo>>ignora;
+            arquivo>>v2;
+            cout << "vertice: " << v2;
+            arquivo>>barra;
+            arquivo>>ignora;
+            arquivo>>barra;
+            arquivo>>ignora;
+            arquivo>>v3;
+            cout << "vertice: " << v3;
+            arquivo>>barra;
+            arquivo>>ignora;
+            arquivo>>barra;
+            arquivo>>ignora;
+
+            face[0] = v1;
+            face[1] = v2;
+            face[2] = v3;
+
+            cout << "face: " << face[0] << ' ' << face[1] << ' ' << face[2] << endl;
+    /*
+            if(arq == 0)
+                faces.push_back(face);
+            else if(arq == 1)
+                faces2.push_back(face);
+            else if(arq == 2)
+                faces3.push_back(face);
+*/
+		}
 
 		//cout<<aux<<endl;
 	}
+
 }
 
 void mouseHandler(int button, int state, int x, int y){
@@ -243,6 +287,7 @@ void mouseHandler(int button, int state, int x, int y){
                         leObj(nomes[arq]);
                         importado[arq] = true;
                         arq ++;
+                        cout << arq << endl;
                     }
                 }
             }

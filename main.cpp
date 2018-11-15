@@ -282,6 +282,7 @@ void leObj(string nome){
     face.push_back(0);
     face.push_back(0);
     int v1, v2, v3, ignora;
+    string s1, s2, s3;
     char barra;
 
 	while(!arquivo.eof()){
@@ -306,38 +307,32 @@ void leObj(string nome){
 
 		}
 		else if(tipo == "f"){
-            arquivo>>v1;
-           // cout << "vertice: " << v1;
-            arquivo>>barra;
-            arquivo>>ignora;
-            arquivo>>barra;
-            arquivo>>ignora;
-            arquivo>>v2;
-            //cout << "vertice: " << v2;
-            arquivo>>barra;
-            arquivo>>ignora;
-            arquivo>>barra;
-            arquivo>>ignora;
-            arquivo>>v3;
-           // cout << "vertice: " << v3;
-            arquivo>>barra;
-            arquivo>>ignora;
-            arquivo>>barra;
-            arquivo>>ignora;
+            arquivo >> s1;
+            arquivo >> s2;
+            arquivo >> s3;
+
+            std::string::size_type sz;   // alias of size_t
+
+            int pos = s1.find('/');
+            v1 = std::stoi( s1.substr(0, pos), &sz, 10 );
+            pos = s2.find('/');
+            v2 = std::stoi( s2.substr(0, pos), &sz, 10 );
+            pos = s3.find('/');
+            v3 = std::stoi( s3.substr(0, pos), &sz, 10 );
 
             face[0] = v1;
             face[1] = v2;
             face[2] = v3;
 
-            //cout << "face: " << face[0] << ' ' << face[1] << ' ' << face[2] << endl;
-    /*
+            cout << "face: " << face[0] << ' ' << face[1] << ' ' << face[2] << endl;
+
             if(arq == 0)
                 faces.push_back(face);
             else if(arq == 1)
                 faces2.push_back(face);
             else if(arq == 2)
                 faces3.push_back(face);
-*/
+
 		}
 
 		//cout<<aux<<endl;

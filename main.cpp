@@ -225,28 +225,32 @@ void desenhaMenuLateral(){
 }
 
 void tri(int a, int b, int c) {
-    glColor3f(1.0,0.0,0.0);
-    glBegin(GL_TRIANGLES);
-        glVertex3f(vertices[a][0],vertices[a][1],vertices[a][2]);
-        glVertex3f(vertices[b][0],vertices[b][1],vertices[b][2]);
-        glVertex3f(vertices[c][0],vertices[c][1],vertices[c][2]);
-    glEnd();
+    cout << vertices.size() << endl;
+    cout << vertices[a][0] << ' ' << vertices[a][1] << ' ' << vertices[a][2] << endl;
+    if(a < vertices.size() && b < vertices.size() && c < vertices.size()){
+        glColor3f(1.0,0.0,0.0);
+        glBegin(GL_TRIANGLES);
+            glVertex3f(vertices[a][0],vertices[a][1],vertices[a][2]);
+            glVertex3f(vertices[b][0],vertices[b][1],vertices[b][2]);
+            glVertex3f(vertices[c][0],vertices[c][1],vertices[c][2]);
+        glEnd();
+    }
 }
 
 void desenhaObj(int x) {
     if(x == 0){
-        for(int i=0; i< vertices.size()-2; i++){
-            tri(i,i+1,i+2);
+        for(int i=0; i< faces.size()-1; i++){
+            tri(faces[i][0], faces[i][1], faces[i][2]);
         }
     }
     else if(x == 1){
-        for(int i=0; i< vertices2.size()-2; i++){
-            tri(i,i+1,i+2);
+        for(int i=0; i< faces2.size(); i++){
+            //tri(vertices2[faces2[i][0]], vertices2[faces2[i][1]], vertices2[faces2[i][2]]);
         }
     }
     else if(x == 2){
-        for(int i=0; i< vertices3.size()-2; i++){
-            tri(i,i+1,i+2);
+        for(int i=0; i< faces3.size(); i++){
+            //tri(vertices3[faces3[i][0]], vertices3[faces3[i][1]], vertices3[faces3[i][2]]);
         }
     }
 }
@@ -324,7 +328,7 @@ void leObj(string nome){
             face[1] = v2;
             face[2] = v3;
 
-            cout << "face: " << face[0] << ' ' << face[1] << ' ' << face[2] << endl;
+            //cout << "face: " << face[0] << ' ' << face[1] << ' ' << face[2] << endl;
 
             if(arq == 0)
                 faces.push_back(face);
@@ -344,16 +348,16 @@ void mouseHandler(int button, int state, int x, int y){
     if (button == GLUT_LEFT_BUTTON){
         if (state == GLUT_DOWN) {
             if( x > LARGURA_JANELA - LARGURA_JANELA/3){
-                cout<< "Cliquei em " << x << " " << y << endl;
+                //cout<< "Cliquei em " << x << " " << y << endl;
                 ClickImport = true;
-                cout<< DIR_IMPORTAR+3 << endl;
+                //cout<< DIR_IMPORTAR+3 << endl;
                 if(arq < 3) {
                     if(x> 804 && x<890 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR){
                         leObj(obj[arq].nome);
                         obj[arq].nome = obj[arq].nome;
                         importado[arq] = true;
                         arq ++;
-                        cout << arq << endl;
+                        //cout << arq << endl;
                     }
                 }
             }

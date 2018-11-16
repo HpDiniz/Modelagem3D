@@ -237,6 +237,33 @@ void tri(int a, int b, int c) {
     }
 }
 
+void tri2(int a, int b, int c) {
+    cout << vertices2.size() << endl;
+    cout << vertices2[a][0] << ' ' << vertices2[a][1] << ' ' << vertices2[a][2] << endl;
+    if(a < vertices2.size() && b < vertices2.size() && c < vertices2.size()){
+        glColor3f(1.0,0.0,0.0);
+        glBegin(GL_TRIANGLES);
+            glVertex3f(vertices2[a][0],vertices2[a][1],vertices2[a][2]);
+            glVertex3f(vertices2[b][0],vertices2[b][1],vertices2[b][2]);
+            glVertex3f(vertices2[c][0],vertices2[c][1],vertices2[c][2]);
+        glEnd();
+    }
+}
+
+void tri3(int a, int b, int c) {
+    cout << vertices3.size() << endl;
+    cout << vertices3[a][0] << ' ' << vertices3[a][1] << ' ' << vertices3[a][2] << endl;
+    if(a < vertices3.size() && b < vertices3.size() && c < vertices3.size()){
+        glColor3f(1.0,0.0,0.0);
+        glBegin(GL_TRIANGLES);
+            glVertex3f(vertices3[a][0],vertices3[a][1],vertices3[a][2]);
+            glVertex3f(vertices3[b][0],vertices3[b][1],vertices3[b][2]);
+            glVertex3f(vertices3[c][0],vertices3[c][1],vertices3[c][2]);
+        glEnd();
+    }
+}
+
+
 void desenhaObj(int x) {
     if(x == 0){
         for(int i=0; i< faces.size()-1; i++){
@@ -245,12 +272,12 @@ void desenhaObj(int x) {
     }
     else if(x == 1){
         for(int i=0; i< faces2.size(); i++){
-            //tri(vertices2[faces2[i][0]], vertices2[faces2[i][1]], vertices2[faces2[i][2]]);
+            tri2(faces2[i][0], faces2[i][1], faces2[i][2]);
         }
     }
     else if(x == 2){
         for(int i=0; i< faces3.size(); i++){
-            //tri(vertices3[faces3[i][0]], vertices3[faces3[i][1]], vertices3[faces3[i][2]]);
+            tri3(faces3[i][0], faces3[i][1], faces3[i][2]);
         }
     }
 }

@@ -20,36 +20,70 @@ using namespace std;
 #define BAIXO_IMPORTAR 10
 #define CIMA_IMPORTAR 50
 
+class vertice {
+public:
+    GLfloat x;
+    GLfloat y;
+    GLfloat z;
+
+    vertice();
+    vertice(GLfloat x, GLfloat y, GLfloat z){
+        this->x = x;
+        this->y = y;
+        this->z = z;
+    }
+
+    vertice operator=(vertice v){
+        GLfloat a, b, c;
+        a = v.x;
+        b = v.y;
+        c = v.z;
+        return vertice(a, b, c);
+    }
+};
+
+class face {
+public:
+    vertice um;
+    vertice dois;
+    vertice tres;
+
+    face(vertice a, vertice b, vertice c){
+        this->um = a;
+        this->dois = b;
+        this->tres = c;
+    }
+};
+
+
 class objeto{
 public:
     string nome;
     float transX, transY, transZ;
     float scaleX, scaleY, scaleZ;
     float rotX, rotY, rotZ, rotAngle;
+    vector<face> faces;
 
     objeto(){
         nome = "";
         transX = 1.1; transY = 1.2; transZ = 1.3;
         scaleX = 3.1; scaleY = 3.2; scaleZ = 3.3;
         rotX = 2.1; rotY = 2.2; rotZ = 2.3; rotAngle = 0.5;
+        faces = new vector<face>;
     }
 };
+
 
 int objs = 0;
 string nomeArq;
 objeto obj[3];
 bool importado[3];
 unsigned short int arq = 0;
-unsigned short int selecionado = 0; // 0 PARA O OBJETO 3D, 1 PARA BARRA DE PESQUISA
+bool ClickImport = false;
 bool enviar = false;
 bool nomeValido = false;
-vector<vector<GLfloat> > vertices;
-vector<vector<GLfloat> > vertices1;
-vector<vector<GLfloat> > vertices2;
-vector<vector<GLfloat> > vertices3;
-vector<vector<int> > faces;
-vector<vector<int> > faces2;
-vector<vector<int> > faces3;
+vector<vertice> vertices;
+
 const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 
 GLdouble viewer[] = {20.0, 20.0, 30.0};
@@ -113,7 +147,7 @@ void submenu(int x_ini, int y_ini, int index){
     x = x_ini;
 
     y = y + y_spacer;
-    // Desenha inputs rotaÃ§Ã£o
+    // Desenha inputs rotação
     glColor3f(0.0, 0.0, 0.0);
     renderBitmapString(x,y-5,(void *)font,"Rotacao");
     glColor3f(1.0, 1.0, 1.0);
@@ -225,71 +259,25 @@ void desenhaMenuLateral(){
     glEnd();
 }
 
-void tri(int a, int b, int c) {
-    cout << vertices.size() << endl;
-    cout << vertices[a][0] << ' ' << vertices[a][1] << ' ' << vertices[a][2] << endl;
-    if(a < vertices.size() && b < vertices.size() && c < vertices.size()){
-        glColor3f(1.0,0.0,0.0);
-        glBegin(GL_TRIANGLES);
-            glVertex3f(vertices[a][0],vertices[a][1],vertices[a][2]);
-            glVertex3f(vertices[b][0],vertices[b][1],vertices[b][2]);
-            glVertex3f(vertices[c][0],vertices[c][1],vertices[c][2]);
-        glEnd();
-    }
+void tri(vertice a, vertice b, vertice c) {
+    glColor3f(1.0,0.0,0.0);
+    glBegin(GL_TRIANGLES);
+        glVertex3f(a.x, a.y, a.z);
+        glVertex3f(b.x, b.y, b.z);
+        glVertex3f(c.x, c.y, c.z);
+    glEnd();
 }
-
-void tri2(int a, int b, int c) {
-    cout << vertices2.size() << endl;
-    cout << vertices2[a][0] << ' ' << vertices2[a][1] << ' ' << vertices2[a][2] << endl;
-    if(a < vertices2.size() && b < vertices2.size() && c < vertices2.size()){
-        glColor3f(1.0,0.0,0.0);
-        glBegin(GL_TRIANGLES);
-            glVertex3f(vertices2[a][0],vertices2[a][1],vertices2[a][2]);
-            glVertex3f(vertices2[b][0],vertices2[b][1],vertices2[b][2]);
-            glVertex3f(vertices2[c][0],vertices2[c][1],vertices2[c][2]);
-        glEnd();
-    }
-}
-
-void tri3(int a, int b, int c) {
-    cout << vertices3.size() << endl;
-    cout << vertices3[a][0] << ' ' << vertices3[a][1] << ' ' << vertices3[a][2] << endl;
-    if(a < vertices3.size() && b < vertices3.size() && c < vertices3.size()){
-        glColor3f(1.0,0.0,0.0);
-        glBegin(GL_TRIANGLES);
-            glVertex3f(vertices3[a][0],vertices3[a][1],vertices3[a][2]);
-            glVertex3f(vertices3[b][0],vertices3[b][1],vertices3[b][2]);
-            glVertex3f(vertices3[c][0],vertices3[c][1],vertices3[c][2]);
-        glEnd();
-    }
-}
-
 
 void desenhaObj(int x) {
-    if(x == 0){
-        for(int i=0; i< faces.size()-1; i++){
-            tri(faces[i][0], faces[i][1], faces[i][2]);
-        }
-    }
-    else if(x == 1){
-        for(int i=0; i< faces2.size(); i++){
-            tri2(faces2[i][0], faces2[i][1], faces2[i][2]);
-        }
-    }
-    else if(x == 2){
-        for(int i=0; i< faces3.size(); i++){
-            tri3(faces3[i][0], faces3[i][1], faces3[i][2]);
-        }
+    for(int i=0; i<obj[x].faces.size(); i++){
+        tri(obj[x].faces[i].um, obj[x].faces[i].dois, obj[x].faces[i].tres);
     }
 }
 
 void leObj(string nome){
 
-
     ifstream arquivo;
 
-	// cin >> nome_arquivo;
-	//string nome = "boneco.obj";
     const char * nome_arquivo = nome.c_str();
 
 	arquivo.open(nome_arquivo);
@@ -300,42 +288,26 @@ void leObj(string nome){
 		cerr << "Erro ao abrir arquivo." << endl;
 		exit(1);
 	}
+	objeto obj = new objeto();
 
 	string tipo;
     GLfloat x;
 	GLfloat y;
 	GLfloat z;
-	vector<GLfloat> ponto;
-    ponto.push_back(0);
-    ponto.push_back(0);
-    ponto.push_back(0);
-    vector<int> face;
-    face.push_back(0);
-    face.push_back(0);
-    face.push_back(0);
-    int v1, v2, v3, ignora;
+
+    int indice_v1, indice_v2, indice_v3;
     string s1, s2, s3;
-    char barra;
 
 	while(!arquivo.eof()){
 
 		arquivo>>tipo;
 		if(tipo == "v"){
-            //getline(arquivo, aux);
             arquivo>>x;
             arquivo>>y;
             arquivo>>z;
 
-            ponto[0] = x;
-            ponto[1] = y;
-            ponto[2] = z;
-            //cout<<tipo<<" "<<x<<" "<<y<<" "<<z<<endl;
-            if(arq == 0)
-                vertices.push_back(ponto);
-            else if(arq == 1)
-                vertices2.push_back(ponto);
-            else if(arq == 2)
-                vertices3.push_back(ponto);
+            vertice v = new vertice(x, y, z);
+            vertices.push_back(v);
 
 		}
 		else if(tipo == "f"){
@@ -346,103 +318,52 @@ void leObj(string nome){
             std::string::size_type sz;   // alias of size_t
 
             int pos = s1.find('/');
-            v1 = std::stoi( s1.substr(0, pos), &sz, 10 );
+            indice_v1 = std::stoi( s1.substr(0, pos), &sz, 10 );
             pos = s2.find('/');
-            v2 = std::stoi( s2.substr(0, pos), &sz, 10 );
+            indice_v2 = std::stoi( s2.substr(0, pos), &sz, 10 );
             pos = s3.find('/');
-            v3 = std::stoi( s3.substr(0, pos), &sz, 10 );
+            indice_v3 = std::stoi( s3.substr(0, pos), &sz, 10 );
 
-            if(v1 < 0) v1 = v1 * (-1);
-            if(v2 < 0) v2 = v2 * (-1);
-            if(v3 < 0) v3 = v3 * (-1);
+            if(indice_v1 < 0) {
+                indice_v1 = vertices.size() + indice_v1;
+            }
+            if(indice_v2 < 0) {
+                indice_v2 = vertices.size() + indice_v2;
+            }
+            if(indice_v3 < 0) {
+                indice_v3 = vertices.size() + indice_v3;
+            }
 
-            face[0] = v1;
-            face[1] = v2;
-            face[2] = v3;
+            vertice v1 = vertices[indice_v1];
+            vertice v2 = vertices[indice_v2];
+            vertice v3 = vertices[indice_v3];
 
-            //cout << "face: " << face[0] << ' ' << face[1] << ' ' << face[2] << endl;
+            face f = new face(v1, v2, v3);
 
-            if(arq == 0)
-                faces.push_back(face);
-            else if(arq == 1)
-                faces2.push_back(face);
-            else if(arq == 2)
-                faces3.push_back(face);
-
+            obj.faces.push_back(f);
 		}
-
-		//cout<<aux<<endl;
 	}
-
 }
 
 void mouseHandler(int button, int state, int x, int y){
     if (button == GLUT_LEFT_BUTTON){
         if (state == GLUT_DOWN) {
             if( x > LARGURA_JANELA - LARGURA_JANELA/3){
-               // cout<< "Cliquei em " << x << " " << y << endl;
-                if(x> 615 && x<795 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR)
-                    selecionado = 1;
-                //unsigned short int limite = 0;
-                for(int i=0; i < 4; i++){
-                    for(int j=0; j < 3; j++){
-                        if(i == 3 && j!= 1){
-                            continue;
-                        }
-                        if(x> 615+(i*60) && x<660+(i*60) && y>105+(j*55) && y<133+(j*55)){
-                            if( j == 0 ){ // TRANSLACAO
-                                if( i == 0 ){
-                                    obj[0].transX = x;
-                                }
-                                if( i == 1 ){
-                                    obj[0].transY = x;
-                                }
-                                if( i == 2 ){
-                                    obj[0].transZ = x;
-                                }
-                            }
-                            if( j == 1 ){ // ROTACAO
-                                if( i == 0 ){
-                                    obj[0].rotAngle = x;
-                                }
-                                if( i == 1 ){
-                                    obj[0].rotX = x;
-                                }
-                                if( i == 2 ){
-                                    obj[0].rotY = x;
-                                }
-                                if( i == 3 ){
-                                    obj[0].rotZ = x;
-                                }
-                            }
-                            if( j == 2 ){ // ESCALA
-                                if( i == 0 ){
-                                    obj[0].scaleX = x;
-                                }
-                                if( i == 1 ){
-                                    obj[0].scaleY = x;
-                                }
-                                if( i == 2 ){
-                                    obj[0].scaleZ = x;
-                                }
-                            }
-                            cout<< " linha "<< j<< endl;
-                            cout<< " coluna "<< i<< endl;
-                        }
-                    }
-                }
+                //cout<< "Cliquei em " << x << " " << y << endl;
+                ClickImport = true;
+                //cout<< DIR_IMPORTAR+3 << endl;
                 if(arq < 3) {
                     if(x> 804 && x<890 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR){
                         leObj(obj[arq].nome);
                         obj[arq].nome = obj[arq].nome;
                         importado[arq] = true;
                         arq ++;
-                        selecionado = 0;
+                        //cout << arq << endl;
                     }
                 }
             }
             else
-                selecionado = 0;
+                ClickImport = false;
         }
     }
 }
@@ -496,14 +417,14 @@ void keyboardHandler(unsigned char key, int x, int y){
         cout<<endl;
     }
 
-    if(selecionado == 1){
+    if(ClickImport == true){
         if(arq < 3){ //IMPEDIR USUARIO MANDAR MAIS DE 3 ARQUIVOS
             if((int)key == 46 || ((int)key >= 65 && (int)key <= 90 ) || ((int)key >= 97 && (int)key <= 122 ) || ((int)key >= 48 && (int)key <= 57 )){ //Codigo ASCII apenas de letras e numeros
                 string aux;
                 aux = key;
                 obj[arq].nome = obj[arq].nome + aux;
             }
-            else if( (int)key == 8 && obj[arq].nome.size()>0){ // CODIGO ASCII 8 DO BOTÃƒO BACKSPACE
+            else if( (int)key == 8 && obj[arq].nome.size()>0){ // CODIGO ASCII 8 DO BOTÃO BACKSPACE
                 obj[arq].nome.erase(obj[arq].nome.size()-1); // APAGA ULTIMO CARACTERE DA STRIING
             }
         }

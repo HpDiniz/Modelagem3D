@@ -20,12 +20,48 @@ using namespace std;
 #define BAIXO_IMPORTAR 10
 #define CIMA_IMPORTAR 50
 
+class vertice {
+public:
+    GLfloat x;
+    GLfloat y;
+    GLfloat z;
+
+    vertice();
+    vertice(GLfloat x, GLfloat y, GLfloat z){
+        this->x = x;
+        this->y = y;
+        this->z = z;
+    }
+
+    vertice operator=(vertice v){
+        GLfloat a, b, c;
+        a = v.x;
+        b = v.y;
+        c = v.z;
+        return vertice(a, b, c);
+    }
+};
+
+class face {
+public:
+    vertice um;
+    vertice dois;
+    vertice tres;
+
+    face(vertice a, vertice b, vertice c){
+        this->um = a;
+        this->dois = b;
+        this->tres = c;
+    }
+};
+
 class objeto{
 public:
     string nome;
     float transX, transY, transZ;
     float scaleX, scaleY, scaleZ;
     float rotX, rotY, rotZ, rotAngle;
+    vector<face> faces;
 
     objeto(){
         nome = "";
@@ -294,6 +330,15 @@ void tri(int a, int b, int c) {
         glVertex3f(vertices[a][0],vertices[a][1],vertices[a][2]);
         glVertex3f(vertices[b][0],vertices[b][1],vertices[b][2]);
         glVertex3f(vertices[c][0],vertices[c][1],vertices[c][2]);
+    glEnd();
+}
+
+void tri(vertice a, vertice b, vertice c) {
+    glColor3f(1.0,0.0,0.0);
+    glBegin(GL_TRIANGLES);
+        glVertex3f(a.x, a.y, a.z);
+        glVertex3f(b.x, b.y, b.z);
+        glVertex3f(c.x, c.y, c.z);
     glEnd();
 }
 

@@ -26,11 +26,16 @@ public:
     GLfloat y;
     GLfloat z;
 
-    vertice();
+    vertice(){}
     vertice(GLfloat x, GLfloat y, GLfloat z){
         this->x = x;
         this->y = y;
         this->z = z;
+    }
+    vertice(const vertice& v){
+        this->x = v.x;
+        this->y = v.y;
+        this->z = v.z;
     }
 
     vertice operator=(vertice v){
@@ -48,10 +53,19 @@ public:
     vertice dois;
     vertice tres;
 
+    face(){}
     face(vertice a, vertice b, vertice c){
         this->um = a;
         this->dois = b;
         this->tres = c;
+    }
+
+    face operator=(face f){
+        vertice a, b, c;
+        a = f.um;
+        b = f.dois;
+        c = f.tres;
+        return face(a, b, c);
     }
 };
 
@@ -75,6 +89,20 @@ public:
         cout<<"X: "<<scaleX<<" Y: "<<scaleY<<" Z: "<<scaleZ<<endl;
         cout<<endl;
     }
+    objeto& operator=(objeto o){
+        nome = o.nome;
+        rotAngle = o.rotAngle;
+        rotX = o.rotX;
+        rotY = o.rotY;
+        rotZ = o.rotZ;
+        scaleX = o.scaleX;
+        scaleY = o.scaleY;
+        scaleZ = o.scaleZ;
+        transX = o.transX;
+        transY = o.transY;
+        transZ = o.transZ;
+        return *this;
+    }
 
 };
 
@@ -96,6 +124,7 @@ vector<vector<int> > faces2;
 vector<vector<int> > faces3;
 const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 const int font2 = (int)GLUT_BITMAP_HELVETICA_18;
+vector<vertice> listaVertices;
 
 GLdouble viewer[] = {3.0, 3.0, 3.0};
 
@@ -325,7 +354,7 @@ void desenhaMenuLateral(){
 }
 
 void tri(int a, int b, int c) {
-    glColor3f(1.0,0.0,0.0);
+    glColor3f(1.0,0.0,1.0);
     glBegin(GL_TRIANGLES);
         glVertex3f(vertices[a][0],vertices[a][1],vertices[a][2]);
         glVertex3f(vertices[b][0],vertices[b][1],vertices[b][2]);
@@ -334,12 +363,19 @@ void tri(int a, int b, int c) {
 }
 
 void tri(vertice a, vertice b, vertice c) {
-    glColor3f(1.0,0.0,0.0);
+    glColor3f(1.0,1.0,0.0);
     glBegin(GL_TRIANGLES);
         glVertex3f(a.x, a.y, a.z);
         glVertex3f(b.x, b.y, b.z);
         glVertex3f(c.x, c.y, c.z);
     glEnd();
+}
+
+void desenhaObjN(int x) {
+    for(int i=0; i<obj[x].faces.size(); i++){
+        tri(obj[x].faces[i].um, obj[x].faces[i].dois, obj[x].faces[i].tres);
+        //cout << obj[x].faces[i].um.x << endl;
+    }
 }
 
 void desenhaObj(int x) {
@@ -365,18 +401,14 @@ void leObj(string nome){
 
     ifstream arquivo;
 
-	// cin >> nome_arquivo;
-	//string nome = "boneco.obj";
-    const char * nome_arquivo = nome.c_str();
-
-	arquivo.open(nome_arquivo);
-	objs++;
+	arquivo.open(nome);
 
 	if(arquivo.fail()){
-        objs--;
 		cerr << "Erro ao abrir arquivo." << endl;
 		exit(1);
 	}
+	objeto * objeto_aux = new objeto;
+	objs++;
 
 	string tipo;
     GLfloat x;
@@ -386,12 +418,10 @@ void leObj(string nome){
     ponto.push_back(0);
     ponto.push_back(0);
     ponto.push_back(0);
-    vector<int> face;
-    face.push_back(0);
-    face.push_back(0);
-    face.push_back(0);
     int v1, v2, v3, ignora;
     char barra;
+    int indice_v1, indice_v2, indice_v3;
+    string s1, s2, s3;
 
 	while(!arquivo.eof()){
 
@@ -413,43 +443,54 @@ void leObj(string nome){
             else if(arq == 2)
                 vertices3.push_back(ponto);
 
+            vertice * vertice_aux = new vertice(x, y, z);
+            listaVertices.push_back(vertice(x, y, z));
+
 		}
 		else if(tipo == "f"){
-            arquivo>>v1;
-           // cout << "vertice: " << v1;
-            arquivo>>barra;
-            arquivo>>ignora;
-            arquivo>>barra;
-            arquivo>>ignora;
-            arquivo>>v2;
-            //cout << "vertice: " << v2;
-            arquivo>>barra;
-            arquivo>>ignora;
-            arquivo>>barra;
-            arquivo>>ignora;
-            arquivo>>v3;
-           // cout << "vertice: " << v3;
-            arquivo>>barra;
-            arquivo>>ignora;
-            arquivo>>barra;
-            arquivo>>ignora;
+            arquivo >> s1;
+            arquivo >> s2;
+            arquivo >> s3;
 
-            face[0] = v1;
-            face[1] = v2;
-            face[2] = v3;
+            std::string::size_type sz;   // alias of size_t
 
-            //cout << "face: " << face[0] << ' ' << face[1] << ' ' << face[2] << endl;
-    /*
-            if(arq == 0)
-                faces.push_back(face);
-            else if(arq == 1)
-                faces2.push_back(face);
-            else if(arq == 2)
-                faces3.push_back(face);
-*/
+            int pos = s1.find('/');
+            indice_v1 = std::stoi( s1.substr(0, pos), &sz, 10 );
+            pos = s2.find('/');
+            indice_v2 = std::stoi( s2.substr(0, pos), &sz, 10 );
+            pos = s3.find('/');
+            indice_v3 = std::stoi( s3.substr(0, pos), &sz, 10 );
+
+            if(indice_v1 < 0) {
+                cout << indice_v1 <<endl;
+                indice_v1 = listaVertices.size() + indice_v1;
+                cout << indice_v1 <<endl;
+            }
+            if(indice_v2 < 0) {
+                cout << indice_v2 <<endl;
+                indice_v2 = listaVertices.size() + indice_v2;
+                cout << indice_v2 <<endl;
+            }
+            if(indice_v3 < 0) {
+                cout << indice_v3 <<endl;
+                indice_v3 = listaVertices.size() + indice_v3;
+                cout << indice_v3 <<endl;
+            }
+            cout<< "v1: " << listaVertices[indice_v1].x << ' ' << listaVertices[indice_v1].y << ' ' << listaVertices[indice_v1].z <<endl;
+
+            vertice v1(listaVertices[indice_v1].x, listaVertices[indice_v1].y, listaVertices[indice_v1].z);
+            vertice v2(listaVertices[indice_v2].x, listaVertices[indice_v2].y, listaVertices[indice_v2].z);
+            vertice v3(listaVertices[indice_v3].x, listaVertices[indice_v3].y, listaVertices[indice_v3].z);
+
+            face * face_aux = new face(v1, v2, v3);
+            cout << objs << endl;
+
+            obj[objs-1].faces.push_back(*face_aux);
+
 		}
 
 		//cout<<aux<<endl;
+		//obj[objs] = objeto_aux;
 	}
 
 }
@@ -514,6 +555,7 @@ void display(){
     for(int i=0; i<arq; i++){
         if(importado[i] == true)
             desenhaObj(i);
+            desenhaObjN(i);
     }
     glFlush();
 

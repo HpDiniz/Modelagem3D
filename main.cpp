@@ -38,35 +38,32 @@ public:
         this->z = v.z;
     }
 
-    vertice operator=(vertice v){
+    vertice& operator=(vertice v){
         GLfloat a, b, c;
         a = v.x;
         b = v.y;
         c = v.z;
-        return vertice(a, b, c);
+
+        vertice *novo = new vertice(a, b, c);
+        cout<<"class vertice: " << novo->x << ' ' << novo->y << ' ' << novo->z << endl;
+        return *novo;
     }
 };
 
 class face {
 public:
-    vertice um;
-    vertice dois;
-    vertice tres;
+    vertice * um;
+    vertice * dois;
+    vertice * tres;
 
     face(){}
     face(vertice a, vertice b, vertice c){
-        this->um = a;
-        this->dois = b;
-        this->tres = c;
+        um = new vertice(a);
+        dois = new vertice(b);
+        tres = new vertice(c);
+        cout << "um: " << um->x << ' ' << um->y << ' ' << um->z << endl;
     }
 
-    face operator=(face f){
-        vertice a, b, c;
-        a = f.um;
-        b = f.dois;
-        c = f.tres;
-        return face(a, b, c);
-    }
 };
 
 class objeto{
@@ -76,6 +73,7 @@ public:
     float scaleX, scaleY, scaleZ;
     float rotX, rotY, rotZ, rotAngle;
     vector<face> faces;
+    GLfloat cor[3];
 
     objeto(){
         nome = "";
@@ -105,7 +103,8 @@ public:
     }
 
 };
-
+GLfloat colors[6][3] = { {0.0,0.0,0.0} , {1.0,0.0,0.0}, {1.0,1.0,0.0}, {0.0,1.0,0.0},
+{0.0,0.0,1.0} , {1.0,0.0,1.0}};
 int objs = 0;
 string nomeArq;
 objeto obj[3];
@@ -126,7 +125,7 @@ const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 const int font2 = (int)GLUT_BITMAP_HELVETICA_18;
 vector<vertice> listaVertices;
 
-GLdouble viewer[] = {3.0, 3.0, 3.0};
+GLdouble viewer[] = {8.0, 8.0, 8.0};
 
 
 void contaTriangulos(){}
@@ -302,12 +301,12 @@ void desenhaEixos() {
     glEnd();
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_LINES);
-        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(0.0, -100.0, 0.0);
         glVertex3f(0.0, 100.0, 0.0);
     glEnd();
     glColor3f(0.0, 0.0, 1.0);
     glBegin(GL_LINES);
-        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(0.0, 0.0, -100.0);
         glVertex3f(0.0, 0.0, 100.0);
     glEnd();
 }
@@ -362,8 +361,8 @@ void tri(int a, int b, int c) {
     glEnd();
 }
 
-void tri(vertice a, vertice b, vertice c) {
-    glColor3f(1.0,1.0,0.0);
+void tri(vertice a, vertice b, vertice c, int ind) {
+    glColor3f(obj[ind].cor[0], obj[ind].cor[1], obj[ind].cor[2]);
     glBegin(GL_TRIANGLES);
         glVertex3f(a.x, a.y, a.z);
         glVertex3f(b.x, b.y, b.z);
@@ -373,7 +372,7 @@ void tri(vertice a, vertice b, vertice c) {
 
 void desenhaObjN(int x) {
     for(int i=0; i<obj[x].faces.size(); i++){
-        tri(obj[x].faces[i].um, obj[x].faces[i].dois, obj[x].faces[i].tres);
+        tri(*obj[x].faces[i].um, *obj[x].faces[i].dois, *obj[x].faces[i].tres, x);
         //cout << obj[x].faces[i].um.x << endl;
     }
 }
@@ -408,6 +407,9 @@ void leObj(string nome){
 		exit(1);
 	}
 	objeto * objeto_aux = new objeto;
+	obj[objs].cor[0] = colors[objs][0];
+	obj[objs].cor[1] = colors[objs][1];
+	obj[objs].cor[2] = colors[objs][2];
 	objs++;
 
 	string tipo;
@@ -478,11 +480,15 @@ void leObj(string nome){
             }
             cout<< "v1: " << listaVertices[indice_v1].x << ' ' << listaVertices[indice_v1].y << ' ' << listaVertices[indice_v1].z <<endl;
 
-            vertice v1(listaVertices[indice_v1].x, listaVertices[indice_v1].y, listaVertices[indice_v1].z);
-            vertice v2(listaVertices[indice_v2].x, listaVertices[indice_v2].y, listaVertices[indice_v2].z);
-            vertice v3(listaVertices[indice_v3].x, listaVertices[indice_v3].y, listaVertices[indice_v3].z);
+            vertice * v1 = new vertice(listaVertices[indice_v1].x, listaVertices[indice_v1].y, listaVertices[indice_v1].z);
+            vertice * v2 = new vertice(listaVertices[indice_v2].x, listaVertices[indice_v2].y, listaVertices[indice_v2].z);
+            vertice * v3 = new vertice(listaVertices[indice_v3].x, listaVertices[indice_v3].y, listaVertices[indice_v3].z);
 
-            face * face_aux = new face(v1, v2, v3);
+            cout << "vertice 1: " << v1->x << ' ' << v1->y << ' ' << v1->z << endl;
+            face * face_aux = new face(*v1, *v2, *v3);
+            cout << "face: " << endl << "vertice1: " << face_aux->um->x << ' ' << face_aux->um->y << ' ' << face_aux->um->z << endl;
+            cout << "vertice2: " << face_aux->dois->x << ' ' << face_aux->dois->y << ' ' << face_aux->dois->z << endl;
+            cout << "vertice3: " << face_aux->tres->x << ' ' << face_aux->tres->y << ' ' << face_aux->tres->z << endl;
             cout << objs << endl;
 
             obj[objs-1].faces.push_back(*face_aux);
@@ -546,7 +552,7 @@ void display(){
     glMatrixMode(GL_PROJECTION);
     glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
     glLoadIdentity();
-    glFrustum(-2.0, 2.0, -2.0, 2.0, 2.0, 20.0);
+    glFrustum(-2.0, 2.0, -2.0, 2.0, 1.0, 100.0);
     gluLookAt(viewer[0],viewer[1],viewer[2], // define posicao do observador
     0.0, 0.0, 0.0,                           // ponto de interesse (foco)
     0.0, 1.0, 0.0);                          // vetor de "view up"

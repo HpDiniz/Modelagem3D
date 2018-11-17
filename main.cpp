@@ -537,8 +537,10 @@ void keyboardHandler(unsigned char key, int x, int y){
                             else {
                                 string aux;
                                 aux = key;
-                                novoP = novoP + aux;
-                                mudaParam(j,i,k,stof(novoP));
+                                if(novoP.size()<4){
+                                    novoP = novoP + aux;
+                                    mudaParam(j,i,k,stof(novoP));
+                                }
                                 if((int)key == 13){
                                     mudaParam(j,i,k,stof(novoP));
                                     clicked[k][j][i] == 0;

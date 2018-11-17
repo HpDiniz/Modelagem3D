@@ -11,7 +11,6 @@
 #include <iomanip>
 
 using namespace std;
-//comit
 
 #define LARGURA_JANELA 900
 #define ALTURA_JANELA 700
@@ -45,7 +44,6 @@ public:
         c = v.z;
 
         vertice *novo = new vertice(a, b, c);
-        cout<<"class vertice: " << novo->x << ' ' << novo->y << ' ' << novo->z << endl;
         return *novo;
     }
 };
@@ -61,9 +59,7 @@ public:
         um = new vertice(a);
         dois = new vertice(b);
         tres = new vertice(c);
-        cout << "um: " << um->x << ' ' << um->y << ' ' << um->z << endl;
     }
-
 };
 
 class objeto{
@@ -77,9 +73,9 @@ public:
 
     objeto(){
         nome = "";
-        transX = 1.1; transY = 1.2; transZ = 1.3;
-        scaleX = 3.1; scaleY = 3.2; scaleZ = 3.3;
-        rotX = 2.1; rotY = 2.2; rotZ = 2.3; rotAngle = 0.5;
+        transX = 0; transY = 0; transZ = 0;
+        scaleX = 1; scaleY = 1; scaleZ = 1;
+        rotX = 0; rotY = 0; rotZ = 0; rotAngle = 0;
     }
     void imprime(){
         cout<<"X: "<<transX<<" Y: "<<transY<<" Z: "<<transZ<<endl;
@@ -87,48 +83,23 @@ public:
         cout<<"X: "<<scaleX<<" Y: "<<scaleY<<" Z: "<<scaleZ<<endl;
         cout<<endl;
     }
-    objeto& operator=(objeto o){
-        nome = o.nome;
-        rotAngle = o.rotAngle;
-        rotX = o.rotX;
-        rotY = o.rotY;
-        rotZ = o.rotZ;
-        scaleX = o.scaleX;
-        scaleY = o.scaleY;
-        scaleZ = o.scaleZ;
-        transX = o.transX;
-        transY = o.transY;
-        transZ = o.transZ;
-        return *this;
-    }
-
 };
-GLfloat colors[6][3] = { {0.0,0.0,0.0} , {1.0,0.0,0.0}, {1.0,1.0,0.0}, {0.0,1.0,0.0},
-{0.0,0.0,1.0} , {1.0,0.0,1.0}};
-int objs = 0;
-string nomeArq;
-objeto obj[3];
+
+int objs = 0, num_tri = 0;
 bool importado[3];
 bool clicked[3][3][4]; // 0 PARA FALSO, 1 PARA TRUE
-string novoP = "";
-unsigned short int arq = 0;
-unsigned short int selecionado = 0; // 0 PARA O OBJETO 3D, 1 PARA BARRA DE PESQUISA
 bool enviar = false;
 bool nomeValido = false;
-vector<vector<GLfloat> > vertices;
-vector<vector<GLfloat> > vertices2;
-vector<vector<GLfloat> > vertices3;
-vector<vector<int> > faces;
-vector<vector<int> > faces2;
-vector<vector<int> > faces3;
+bool wire = true;
+unsigned short int arq = 0;
+unsigned short int selecionado = 0; // 0 PARA O OBJETO 3D, 1 PARA BARRA DE PESQUISA
 const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 const int font2 = (int)GLUT_BITMAP_HELVETICA_18;
+string nomeArq, novoP = "";
 vector<vertice> listaVertices;
-
+GLfloat colors[6][3] = { {0.2,0.9,0.8} , {0.8,0.4,0.2}, {1.0,1.0,0.3}, {0.5,1.0,0.5},{0.3,0.4,1.0} , {1.0,0.7,1.0}};
 GLdouble viewer[] = {8.0, 8.0, 8.0};
-
-
-void contaTriangulos(){}
+objeto obj[3];
 
 void calculaFrames(){}
 
@@ -145,8 +116,7 @@ void submenu(int x_ini, int y_ini, int index){
     int x = x_ini, y = y_ini;
     int x_inc = 15, x_spacer = 20;
     int y_inc = 28, y_spacer = 55;
-    //obj[arq-1].imprime();
-    stringstream ss; //from
+    stringstream ss;
     ss << obj[index].nome;
     string s = ss.str ();
     char* char_type = (char*) s.c_str();
@@ -157,7 +127,6 @@ void submenu(int x_ini, int y_ini, int index){
     for(int j=0; j<=2;j++){
 
         glColor3f(0.0, 0.0, 0.0);
-       // cout<< setprecision(1) << obj[index].transX << fixed <<endl;
         stringstream ss;
 
             if(j == 0)
@@ -185,7 +154,6 @@ void submenu(int x_ini, int y_ini, int index){
     x = x_ini;
 
     y = y + y_spacer;
-    // Desenha inputs rotação
     glColor3f(0.0, 0.0, 0.0);
     renderBitmapString(x,y-5,(void *)font,"Rotacao");
     glColor3f(1.0, 1.0, 1.0);
@@ -222,7 +190,6 @@ void submenu(int x_ini, int y_ini, int index){
     glColor3f(0.0, 0.0, 0.0);
     renderBitmapString(x,y-5,(void *)font,"Escala");
     glColor3f(1.0, 1.0, 1.0);
-    // Desenha inputs escala
     for(int j=0; j<=2;j++){
         glColor3f(0.0, 0.0, 0.0);
         stringstream ss;
@@ -249,8 +216,6 @@ void submenu(int x_ini, int y_ini, int index){
 
         x += x_spacer;
     }
-
-
 }
 
 void mudaParam(int j, int i, int ob, float valor){
@@ -296,7 +261,7 @@ void mudaParam(int j, int i, int ob, float valor){
 void desenhaEixos() {
     glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
-        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(-100.0, 0.0, 0.0);
         glVertex3f(100.0, 0.0, 0.0);
     glEnd();
     glColor3f(0.0, 1.0, 0.0);
@@ -315,7 +280,7 @@ void desenhaMenuLateral(){
 
     // Desenha input importar
     glColor3f(0.0, 0.0, 0.0);
-    std::stringstream ss; //from
+    std::stringstream ss;
     ss << obj[arq].nome;
     std::string s = ss.str ();
     char* char_type = (char*) s.c_str();
@@ -352,46 +317,32 @@ void desenhaMenuLateral(){
     glEnd();
 }
 
-void tri(int a, int b, int c) {
-    glColor3f(1.0,0.0,1.0);
-    glBegin(GL_TRIANGLES);
-        glVertex3f(vertices[a][0],vertices[a][1],vertices[a][2]);
-        glVertex3f(vertices[b][0],vertices[b][1],vertices[b][2]);
-        glVertex3f(vertices[c][0],vertices[c][1],vertices[c][2]);
-    glEnd();
-}
-
 void tri(vertice a, vertice b, vertice c, int ind) {
     glColor3f(obj[ind].cor[0], obj[ind].cor[1], obj[ind].cor[2]);
-    glBegin(GL_TRIANGLES);
-        glVertex3f(a.x, a.y, a.z);
-        glVertex3f(b.x, b.y, b.z);
-        glVertex3f(c.x, c.y, c.z);
-    glEnd();
-}
-
-void desenhaObjN(int x) {
-    for(int i=0; i<obj[x].faces.size(); i++){
-        tri(*obj[x].faces[i].um, *obj[x].faces[i].dois, *obj[x].faces[i].tres, x);
-        //cout << obj[x].faces[i].um.x << endl;
+    glPushMatrix();
+    glTranslatef(obj[ind].transX, obj[ind].transY, obj[ind].transZ);
+    glScalef(obj[ind].scaleX, obj[ind].scaleY, obj[ind].scaleZ);
+    glRotatef(obj[ind].rotAngle, obj[ind].rotX, obj[ind].rotY, obj[ind].rotZ);
+    if(!wire){
+       glBegin(GL_TRIANGLES);
+            glVertex3f(a.x, a.y, a.z);
+            glVertex3f(b.x, b.y, b.z);
+            glVertex3f(c.x, c.y, c.z);
+        glEnd();
+    }else {
+        glBegin(GL_LINE_LOOP);
+            glVertex3f(a.x, a.y, a.z);
+            glVertex3f(b.x, b.y, b.z);
+            glVertex3f(c.x, c.y, c.z);
+        glEnd();
     }
+    glPopMatrix();
 }
 
 void desenhaObj(int x) {
-    if(x == 0){
-        for(int i=0; i< vertices.size()-2; i++){
-            tri(i,i+1,i+2);
-        }
-    }
-    else if(x == 1){
-        for(int i=0; i< vertices2.size()-2; i++){
-            tri(i,i+1,i+2);
-        }
-    }
-    else if(x == 2){
-        for(int i=0; i< vertices3.size()-2; i++){
-            tri(i,i+1,i+2);
-        }
+    for(int i=0; i<obj[x].faces.size(); i++){
+        tri(*obj[x].faces[i].um, *obj[x].faces[i].dois, *obj[x].faces[i].tres, x);
+        num_tri++;
     }
 }
 
@@ -406,7 +357,7 @@ void leObj(string nome){
 		cerr << "Erro ao abrir arquivo." << endl;
 		exit(1);
 	}
-	objeto * objeto_aux = new objeto;
+	listaVertices.clear();
 	obj[objs].cor[0] = colors[objs][0];
 	obj[objs].cor[1] = colors[objs][1];
 	obj[objs].cor[2] = colors[objs][2];
@@ -416,12 +367,7 @@ void leObj(string nome){
     GLfloat x;
 	GLfloat y;
 	GLfloat z;
-	vector<GLfloat> ponto;
-    ponto.push_back(0);
-    ponto.push_back(0);
-    ponto.push_back(0);
-    int v1, v2, v3, ignora;
-    char barra;
+
     int indice_v1, indice_v2, indice_v3;
     string s1, s2, s3;
 
@@ -429,21 +375,9 @@ void leObj(string nome){
 
 		arquivo>>tipo;
 		if(tipo == "v"){
-            //getline(arquivo, aux);
             arquivo>>x;
             arquivo>>y;
             arquivo>>z;
-
-            ponto[0] = x;
-            ponto[1] = y;
-            ponto[2] = z;
-            //cout<<tipo<<" "<<x<<" "<<y<<" "<<z<<endl;
-            if(arq == 0)
-                vertices.push_back(ponto);
-            else if(arq == 1)
-                vertices2.push_back(ponto);
-            else if(arq == 2)
-                vertices3.push_back(ponto);
 
             vertice * vertice_aux = new vertice(x, y, z);
             listaVertices.push_back(vertice(x, y, z));
@@ -464,39 +398,24 @@ void leObj(string nome){
             indice_v3 = std::stoi( s3.substr(0, pos), &sz, 10 );
 
             if(indice_v1 < 0) {
-                cout << indice_v1 <<endl;
                 indice_v1 = listaVertices.size() + indice_v1;
-                cout << indice_v1 <<endl;
             }
             if(indice_v2 < 0) {
-                cout << indice_v2 <<endl;
                 indice_v2 = listaVertices.size() + indice_v2;
-                cout << indice_v2 <<endl;
             }
             if(indice_v3 < 0) {
-                cout << indice_v3 <<endl;
                 indice_v3 = listaVertices.size() + indice_v3;
-                cout << indice_v3 <<endl;
             }
-            cout<< "v1: " << listaVertices[indice_v1].x << ' ' << listaVertices[indice_v1].y << ' ' << listaVertices[indice_v1].z <<endl;
 
             vertice * v1 = new vertice(listaVertices[indice_v1].x, listaVertices[indice_v1].y, listaVertices[indice_v1].z);
             vertice * v2 = new vertice(listaVertices[indice_v2].x, listaVertices[indice_v2].y, listaVertices[indice_v2].z);
             vertice * v3 = new vertice(listaVertices[indice_v3].x, listaVertices[indice_v3].y, listaVertices[indice_v3].z);
 
-            cout << "vertice 1: " << v1->x << ' ' << v1->y << ' ' << v1->z << endl;
             face * face_aux = new face(*v1, *v2, *v3);
-            cout << "face: " << endl << "vertice1: " << face_aux->um->x << ' ' << face_aux->um->y << ' ' << face_aux->um->z << endl;
-            cout << "vertice2: " << face_aux->dois->x << ' ' << face_aux->dois->y << ' ' << face_aux->dois->z << endl;
-            cout << "vertice3: " << face_aux->tres->x << ' ' << face_aux->tres->y << ' ' << face_aux->tres->z << endl;
-            cout << objs << endl;
-
             obj[objs-1].faces.push_back(*face_aux);
 
 		}
 
-		//cout<<aux<<endl;
-		//obj[objs] = objeto_aux;
 	}
 
 }
@@ -561,7 +480,6 @@ void display(){
     for(int i=0; i<arq; i++){
         if(importado[i] == true)
             desenhaObj(i);
-            desenhaObjN(i);
     }
     glFlush();
 
@@ -575,15 +493,6 @@ void display(){
 
     glutSwapBuffers();
     glutPostRedisplay();
-}
-
-void leVertices(){
-    for(int i=0; i < vertices.size(); i++){
-        cout<<"Ponto["<<i<<"] = ";
-        for(int j=0; j<3; j++)
-            cout<<vertices[i][j]<<" ";
-        cout<< endl;
-    }
 }
 
 void keyboardHandler(unsigned char key, int x, int y){

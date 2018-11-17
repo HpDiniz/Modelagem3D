@@ -98,7 +98,9 @@ const int font2 = (int)GLUT_BITMAP_HELVETICA_18;
 string nomeArq, novoP = "";
 vector<vertice> listaVertices;
 GLfloat colors[6][3] = { {0.2,0.9,0.8} , {0.8,0.4,0.2}, {1.0,1.0,0.3}, {0.5,1.0,0.5},{0.3,0.4,1.0} , {1.0,0.7,1.0}};
-GLdouble viewer[] = {8.0, 8.0, 8.0};
+GLdouble viewer[] = {2.0, 2.0, 2.0};
+GLdouble focus[] = {0.0, 0.0, 0.0};
+GLdouble up[] = {0.0, 1.0, 0.0};
 objeto obj[3];
 
 void calculaFrames(){}
@@ -261,17 +263,17 @@ void mudaParam(int j, int i, int ob, float valor){
 void desenhaEixos() {
     glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
-        glVertex3f(-100.0, 0.0, 0.0);
+        glVertex3f(0.0, 0.0, 0.0);
         glVertex3f(100.0, 0.0, 0.0);
     glEnd();
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_LINES);
-        glVertex3f(0.0, -100.0, 0.0);
+        glVertex3f(0.0, 0.0, 0.0);
         glVertex3f(0.0, 100.0, 0.0);
     glEnd();
     glColor3f(0.0, 0.0, 1.0);
     glBegin(GL_LINES);
-        glVertex3f(0.0, 0.0, -100.0);
+        glVertex3f(0.0, 0.0, 0.0);
         glVertex3f(0.0, 0.0, 100.0);
     glEnd();
 }
@@ -471,10 +473,11 @@ void display(){
     glMatrixMode(GL_PROJECTION);
     glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
     glLoadIdentity();
-    glFrustum(-2.0, 2.0, -2.0, 2.0, 1.0, 100.0);
+    //glFrustum(-2.0, 2.0, -2.0, 2.0, 1.0, 100.0);
+    gluPerspective(70.0,1.0,2.0,20.0);
     gluLookAt(viewer[0],viewer[1],viewer[2], // define posicao do observador
-    0.0, 0.0, 0.0,                           // ponto de interesse (foco)
-    0.0, 1.0, 0.0);                          // vetor de "view up"
+    focus[0],focus[1],focus[2],                           // ponto de interesse (foco)
+    up[0],up[1],up[2]);                          // vetor de "view up"
     glMatrixMode(GL_MODELVIEW);
     desenhaEixos();
     for(int i=0; i<arq; i++){
@@ -498,7 +501,7 @@ void display(){
 void keyboardHandler(unsigned char key, int x, int y){
     if (key == 27) exit(0); //ESC
 
-   // cout<< "ASCII de "<<key<< ": "<<(int)key << endl;
+   cout<< "ASCII de "<<key<< ": "<<(int)key << endl;
 
     if(selecionado == 1){
         if(arq < 3){ //IMPEDIR USUARIO MANDAR MAIS DE 3 ARQUIVOS
@@ -554,12 +557,27 @@ void keyboardHandler(unsigned char key, int x, int y){
         }
     }
     else{
-        if (key == 'x') viewer[0] -= 1.0;
-        if (key == 'X') viewer[0] += 1.0;
-        if (key == 'y') viewer[1] -= 1.0;
-        if (key == 'Y') viewer[1] += 1.0;
-        if (key == 'z') viewer[2] -= 1.0;
-        if (key == 'Z') viewer[2] += 1.0;
+        if (key == 'a') focus[2] -= 1.0;
+        if (key == 's') focus[1] += 1.0;
+        if (key == 'w') focus[1] -= 1.0;
+        if (key == 'd') focus[0] -= 1.0;
+        if (key == 37) focus[2] -= 1.0;
+        if (key == 40) focus[1] += 1.0;
+        if (key == 39) focus[1] -= 1.0;
+        if (key == 38) focus[0] -= 1.0;
+        if (key == 'e') wire = true; //empty
+        if (key == 'f') wire = false; //full
+        if (key == 'z') {
+            viewer[0] -= 1.0;
+            viewer[1] -= 1.0;
+            viewer[2] -= 1.0;
+        }
+        if (key == 'Z') {
+            viewer[0] += 1.0;
+            viewer[1] += 1.0;
+            viewer[2] += 1.0;
+        }
+
     }
     display();
 }

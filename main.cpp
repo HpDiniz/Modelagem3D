@@ -61,7 +61,7 @@ vector<vector<int> > faces3;
 const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 const int font2 = (int)GLUT_BITMAP_HELVETICA_18;
 
-GLdouble viewer[] = {20.0, 20.0, 30.0};
+GLdouble viewer[] = {3.0, 3.0, 3.0};
 
 
 void contaTriangulos(){}
@@ -229,7 +229,23 @@ void mudaParam(int j, int i, int ob, float valor){
                     }
                 }
 
-void desenhaEixos() {}
+void desenhaEixos() {
+    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_LINES);
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(100.0, 0.0, 0.0);
+    glEnd();
+    glColor3f(0.0, 1.0, 0.0);
+    glBegin(GL_LINES);
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(0.0, 100.0, 0.0);
+    glEnd();
+    glColor3f(0.0, 0.0, 1.0);
+    glBegin(GL_LINES);
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(0.0, 0.0, 100.0);
+    glEnd();
+}
 
 void desenhaMenuLateral(){
 
@@ -444,11 +460,12 @@ void display(){
     glMatrixMode(GL_PROJECTION);
     glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
     glLoadIdentity();
-    glFrustum(0.0, 1.0, -1.0, 1.0, 1.0, 150.0);
+    glFrustum(-2.0, 2.0, -2.0, 2.0, 2.0, 20.0);
     gluLookAt(viewer[0],viewer[1],viewer[2], // define posicao do observador
     0.0, 0.0, 0.0,                           // ponto de interesse (foco)
     0.0, 1.0, 0.0);                          // vetor de "view up"
     glMatrixMode(GL_MODELVIEW);
+    desenhaEixos();
     for(int i=0; i<arq; i++){
         if(importado[i] == true)
             desenhaObj(i);
@@ -556,7 +573,6 @@ void init(){
         }
     }
     glClearColor(1.0, 1.0, 1.0, 1.0);
-    //leVertices();
 }
 
 int main(int argc, char **argv){

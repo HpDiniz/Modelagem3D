@@ -473,8 +473,8 @@ void display(){
     glMatrixMode(GL_PROJECTION);
     glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
     glLoadIdentity();
-    //glFrustum(-2.0, 2.0, -2.0, 2.0, 1.0, 100.0);
-    gluPerspective(70.0,1.0,2.0,20.0);
+    glFrustum(-2.0, 2.0, -2.0, 2.0, 1.0, 100.0);
+    //gluPerspective(70.0,1.0,2.0,100.0);
     gluLookAt(viewer[0],viewer[1],viewer[2], // define posicao do observador
     focus[0],focus[1],focus[2],                           // ponto de interesse (foco)
     up[0],up[1],up[2]);                          // vetor de "view up"
@@ -558,8 +558,8 @@ void keyboardHandler(unsigned char key, int x, int y){
     }
     else{
         if (key == 'a') focus[2] -= 1.0;
-        if (key == 's') focus[1] += 1.0;
-        if (key == 'w') focus[1] -= 1.0;
+        //if (key == 's') focus[1] += 1.0;
+        //if (key == 'w') focus[1] -= 1.0;
         if (key == 'd') focus[0] -= 1.0;
         if (key == 37) focus[2] -= 1.0;
         if (key == 40) focus[1] += 1.0;
@@ -567,12 +567,12 @@ void keyboardHandler(unsigned char key, int x, int y){
         if (key == 38) focus[0] -= 1.0;
         if (key == 'e') wire = true; //empty
         if (key == 'f') wire = false; //full
-        if (key == 'z') {
+        if (key == 's') {
             viewer[0] -= 1.0;
             viewer[1] -= 1.0;
             viewer[2] -= 1.0;
         }
-        if (key == 'Z') {
+        if (key == 'w') {
             viewer[0] += 1.0;
             viewer[1] += 1.0;
             viewer[2] += 1.0;

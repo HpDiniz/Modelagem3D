@@ -500,6 +500,8 @@ void display(){
 
 void keyboardHandler(unsigned char key, int x, int y){
     if (key == 27) exit(0); //ESC
+    if (key == '1') glEnable(GL_LIGHTING);
+    if (key == '0') glDisable(GL_LIGHTING);
 
    cout<< "ASCII de "<<key<< ": "<<(int)key << endl;
 

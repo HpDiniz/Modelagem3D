@@ -71,6 +71,7 @@ public:
     float scaleX, scaleY, scaleZ;
     float rotX, rotY, rotZ, rotAngle;
     vector<face> faces;
+    vector<vertice> texturas;
     GLfloat cor[3];
 
     objeto(){
@@ -231,6 +232,33 @@ Image * loadTexture(){
     return image1;
 }
 
+void initLight(void)
+{
+    GLfloat mat_ambient[ ] = { 0.0, 0.0, 1.0, 1.0 };
+    GLfloat mat_diffuse[ ] = { 1.0, 0.0, 0.0, 1.0 };
+    GLfloat mat_specular[ ] = { 0.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_shininess[ ] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_position[ ] = { 1.0, 1.0, 1.0, 0.0 };
+    GLfloat white_light[ ] = { 1.0, 1.0, 1.0, 0.0 };
+    GLfloat red_light[ ] = { 1.0, 0.0, 0.0, 0.0 };
+
+    glClearColor (1.0, 1.0, 1.0, 1.0);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, white_light);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, white_light);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_DEPTH_TEST);
+}
 
 void calculaFrames(){}
 
@@ -556,6 +584,9 @@ void leObj(string nome){
             obj[objs-1].faces.push_back(*face_aux);
 
 		}
+		else if(tipo == "vt"){
+
+		}
 
 	}
 
@@ -625,6 +656,7 @@ void display(){
         if(importado[i] == true){
             glEnable(GL_CULL_FACE);
             glCullFace(GL_FRONT);
+            glBindTexture(GL_TEXTURE_2D, texture[0]);
             desenhaObj(i);
         }
     }
@@ -789,6 +821,7 @@ int main(int argc, char **argv){
     glutCreateWindow("Blender HD");
     init();
     initTexture();
+    initLight();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboardHandler);
     glutMouseFunc(mouseHandler);

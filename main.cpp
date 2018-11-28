@@ -9,6 +9,8 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
+#include <windows.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -97,7 +99,7 @@ const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 const int font2 = (int)GLUT_BITMAP_HELVETICA_18;
 string nomeArq, novoP = "";
 vector<vertice> listaVertices;
-GLfloat colors[6][3] = { {0.2,0.9,0.8} , {0.8,0.4,0.2}, {1.0,1.0,0.3}, {0.5,1.0,0.5},{0.3,0.4,1.0} , {1.0,0.7,1.0}};
+GLfloat colors[6][4] = { {0.7,0.9,0.8,0.5} , {0.8,0.4,0.2,0.5}, {1.0,1.0,0.3,0.5}, {0.5,1.0,0.5,0.5},{0.3,0.4,1.0,0.5} , {1.0,0.7,1.0,0.5}};
 GLdouble viewer[] = {2.0, 2.0, 2.0};
 GLdouble focus[] = {0.0, 0.0, 0.0};
 GLdouble up[] = {0.0, 1.0, 0.0};
@@ -320,7 +322,7 @@ void desenhaMenuLateral(){
 }
 
 void tri(vertice a, vertice b, vertice c, int ind) {
-    glColor3f(obj[ind].cor[0], obj[ind].cor[1], obj[ind].cor[2]);
+    glColor4f(obj[ind].cor[0], obj[ind].cor[1], obj[ind].cor[2], obj[ind].cor[3]);
     glPushMatrix();
     glTranslatef(obj[ind].transX, obj[ind].transY, obj[ind].transZ);
     glScalef(obj[ind].scaleX, obj[ind].scaleY, obj[ind].scaleZ);
@@ -346,6 +348,16 @@ void desenhaObj(int x) {
         tri(*obj[x].faces[i].um, *obj[x].faces[i].dois, *obj[x].faces[i].tres, x);
         num_tri++;
     }
+}
+
+void desenhaPlano()
+{
+	glBegin(GL_QUADS);
+		glVertex3f(2.0f, 0.0f,  0.0f);
+		glVertex3f(0.0f, 0.0f,  2.0f);
+		glVertex3f(0.0f,  2.0f,  2.0f);
+		glVertex3f(2.0f,  2.0f,  0.0f);
+	glEnd();
 }
 
 void leObj(string nome){
@@ -480,10 +492,20 @@ void display(){
     up[0],up[1],up[2]);                          // vetor de "view up"
     glMatrixMode(GL_MODELVIEW);
     desenhaEixos();
+
+    glDisable(GL_BLEND);
     for(int i=0; i<arq; i++){
-        if(importado[i] == true)
+        if(importado[i] == true){
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_FRONT);
             desenhaObj(i);
+        }
     }
+    glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glColor4f(1,0.5,0.7,0.5);
+    desenhaPlano();
     glFlush();
 
     glMatrixMode(GL_PROJECTION);
@@ -500,8 +522,6 @@ void display(){
 
 void keyboardHandler(unsigned char key, int x, int y){
     if (key == 27) exit(0); //ESC
-    if (key == '1') glEnable(GL_LIGHTING);
-    if (key == '0') glDisable(GL_LIGHTING);
 
    cout<< "ASCII de "<<key<< ": "<<(int)key << endl;
 
@@ -559,10 +579,10 @@ void keyboardHandler(unsigned char key, int x, int y){
         }
     }
     else{
-        if (key == 'a') focus[2] -= 1.0;
+        if (key == 'a') focus[2] -= 0.5;
         //if (key == 's') focus[1] += 1.0;
         //if (key == 'w') focus[1] -= 1.0;
-        if (key == 'd') focus[0] -= 1.0;
+        if (key == 'd') focus[0] -= 0.5;
         if (key == 37) focus[2] -= 1.0;
         if (key == 40) focus[1] += 1.0;
         if (key == 39) focus[1] -= 1.0;
@@ -570,14 +590,14 @@ void keyboardHandler(unsigned char key, int x, int y){
         if (key == 'e') wire = true; //empty
         if (key == 'f') wire = false; //full
         if (key == 's') {
-            viewer[0] -= 1.0;
-            viewer[1] -= 1.0;
-            viewer[2] -= 1.0;
+            viewer[0] -= 0.5;
+            viewer[1] -= 0.5;
+            viewer[2] -= 0.5;
         }
         if (key == 'w') {
-            viewer[0] += 1.0;
-            viewer[1] += 1.0;
-            viewer[2] += 1.0;
+            viewer[0] += 0.5;
+            viewer[1] += 0.5;
+            viewer[2] += 0.5;
         }
 
     }
@@ -597,6 +617,7 @@ void init(){
         }
     }
     glClearColor(1.0, 1.0, 1.0, 1.0);
+    glEnable(GL_COLOR_MATERIAL);
 }
 
 int main(int argc, char **argv){

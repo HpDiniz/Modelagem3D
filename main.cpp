@@ -71,7 +71,8 @@ public:
     float scaleX, scaleY, scaleZ;
     float rotX, rotY, rotZ, rotAngle;
     vector<face> faces;
-    vector<vertice> texturas;
+    vector<face> texturas;
+    vector<face> normais;
     GLfloat cor[3];
 
     objeto(){
@@ -100,137 +101,13 @@ const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 const int font2 = (int)GLUT_BITMAP_HELVETICA_18;
 string nomeArq, novoP = "";
 vector<vertice> listaVertices;
-GLfloat colors[6][4] = { {0.7,0.9,0.8,0.5} , {0.8,0.4,0.2,0.5}, {1.0,1.0,0.3,0.5}, {0.5,1.0,0.5,0.5},{0.3,0.4,1.0,0.5} , {1.0,0.7,1.0,0.5}};
+vector<vertice> listaNormais;
+vector<vertice> listaTexturas;
+GLfloat colors[6][4] = { {0.7,0.9,0.8,1.0} , {0.8,0.4,0.2,1.0}, {1.0,1.0,0.3,1.0}, {0.5,1.0,0.5,0.5},{0.3,0.4,1.0,0.5} , {1.0,0.7,1.0,0.5}};
 GLdouble viewer[] = {2.0, 2.0, 2.0};
 GLdouble focus[] = {0.0, 0.0, 0.0};
 GLdouble up[] = {0.0, 1.0, 0.0};
 objeto obj[3];
-
-GLuint texture[2];
-
-struct Image {
-    unsigned long sizeX;
-    unsigned long sizeY;
-    char *data;
-};
-
-
-typedef struct Image Image;
-
-#define checkImageWidth 64
-#define checkImageHeight 64
-
-GLubyte checkImage[checkImageWidth][checkImageHeight][3];
-
-void makeCheckImage(void){
-    int i, j, c;
-    for (i = 0; i < checkImageWidth; i++) {
-        for (j = 0; j < checkImageHeight; j++) {
-            c = ((((i&0x8)==0)^((j&0x8)==0)))*255;
-            checkImage[i][j][0] = (GLubyte) c;
-            checkImage[i][j][1] = (GLubyte) c;
-            checkImage[i][j][2] = (GLubyte) c;
-        }
-    }
-}
-
-int ImageLoad(char *filename, Image *image) {
-    FILE *file;
-    unsigned long size; // size of the image in bytes.
-    unsigned long i; // standard counter.
-    unsigned short int planes; // number of planes in image (must be 1)
-    unsigned short int bpp; // number of bits per pixel (must be 24)
-
-    char temp; // temporary color storage for bgr-rgb conversion.
-    // make sure the file is there.
-
-    if ((file = fopen(filename, "rb"))==NULL){
-        printf("File Not Found : %s\n",filename);
-        return 0;
-    }
-
-    // seek through the bmp header, up to the width/height:
-    fseek(file, 18, SEEK_CUR);
-
-    // read the width
-    if ((i = fread(&image->sizeX, 4, 1, file)) != 1) {
-        printf("Error reading width from %s.\n", filename);
-        return 0;
-    }
-    //printf("Width of %s: %lu\n", filename, image->sizeX);
-
-    // read the height
-    if ((i = fread(&image->sizeY, 4, 1, file)) != 1) {
-        printf("Error reading height from %s.\n", filename);
-        return 0;
-    }
-    //printf("Height of %s: %lu\n", filename, image->sizeY);
-    // calculate the size (assuming 24 bits or 3 bytes per pixel).
-
-    size = image->sizeX * image->sizeY * 3;
-    // read the planes
-    if ((fread(&planes, 2, 1, file)) != 1) {
-        printf("Error reading planes from %s.\n", filename);
-        return 0;
-    }
-
-    if (planes != 1) {
-        printf("Planes from %s is not 1: %u\n", filename, planes);
-        return 0;
-    }
-
-
-    // read the bitsperpixel
-
-    if ((i = fread(&bpp, 2, 1, file)) != 1) {
-        printf("Error reading bpp from %s.\n", filename);
-        return 0;
-    }
-
-    if (bpp != 24) {
-        printf("Bpp from %s is not 24: %u\n", filename, bpp);
-        return 0;
-    }
-    // seek past the rest of the bitmap header.
-
-    fseek(file, 24, SEEK_CUR);
-
-    // read the data.
-    image->data = (char *) malloc(size);
-    if (image->data == NULL) {
-        printf("Error allocating memory for color-corrected image data");
-        return 0;
-    }
-    if ((i = fread(image->data, size, 1, file)) != 1) {
-        printf("Error reading image data from %s.\n", filename);
-        return 0;
-    }
-    for (i=0;i<size;i+=3) { // reverse all of the colors. (bgr -> rgb)
-        temp = image->data[i];
-        image->data[i] = image->data[i+2];
-        image->data[i+2] = temp;
-    }
-    // we're done.
-    return 1;
-}
-
-
-
-Image * loadTexture(){
-    Image *image1;
-    // allocate space for texture
-    image1 = (Image *) malloc(sizeof(Image));
-    if (image1 == NULL) {
-        printf("Error allocating space for image");
-        exit(0);
-    }
-
-    if (!ImageLoad("floor.bmp", image1)) {
-        exit(1);
-    }
-
-    return image1;
-}
 
 void initLight(void)
 {
@@ -256,6 +133,7 @@ void initLight(void)
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
 }
@@ -505,8 +383,7 @@ void desenhaObj(int x) {
     }
 }
 
-void desenhaPlano()
-{
+void desenhaPlano() {
 	glBegin(GL_QUADS);
 		glVertex3f(2.0f, 0.0f,  0.0f);
 		glVertex3f(0.0f, 0.0f,  2.0f);
@@ -539,6 +416,7 @@ void leObj(string nome){
 
     int indice_v1, indice_v2, indice_v3;
     string s1, s2, s3;
+    double t1, t2, t3;
 
 	while(!arquivo.eof()){
 
@@ -552,6 +430,23 @@ void leObj(string nome){
             listaVertices.push_back(vertice(x, y, z));
 
 		}
+		else if(tipo == "vn"){
+            arquivo>>x;
+            arquivo>>y;
+            arquivo>>z;
+
+            vertice * vertice_aux = new vertice(x, y, z);
+            listaNormais.push_back(vertice(x, y, z));
+
+		}
+		else if(tipo == "vt"){
+            arquivo>>x;
+            arquivo>>y;
+            arquivo>>z;
+
+            vertice * vertice_aux = new vertice(x, y, z);
+            listaTexturas.push_back(vertice(x, y, z));
+		}
 		else if(tipo == "f"){
             arquivo >> s1;
             arquivo >> s2;
@@ -561,10 +456,13 @@ void leObj(string nome){
 
             int pos = s1.find('/');
             indice_v1 = std::stoi( s1.substr(0, pos), &sz, 10 );
+            string subT1 = s1.substr(pos+1);
             pos = s2.find('/');
             indice_v2 = std::stoi( s2.substr(0, pos), &sz, 10 );
+            string subT2 = s2.substr(pos+1);
             pos = s3.find('/');
             indice_v3 = std::stoi( s3.substr(0, pos), &sz, 10 );
+            string subT3 = s3.substr(pos+1);
 
             if(indice_v1 < 0) {
                 indice_v1 = listaVertices.size() + indice_v1;
@@ -583,8 +481,58 @@ void leObj(string nome){
             face * face_aux = new face(*v1, *v2, *v3);
             obj[objs-1].faces.push_back(*face_aux);
 
-		}
-		else if(tipo == "vt"){
+            // ------ TEXTURA ------- //
+            pos = subT1.find('/');
+            indice_v1 = std::stoi( subT1.substr(0, pos), &sz, 10 );
+            string subN1 = subT1.substr(pos+1);
+            pos = subT2.find('/');
+            indice_v2 = std::stoi( subT2.substr(0, pos), &sz, 10 );
+            string subN2 = subT2.substr(pos+1);
+            pos = subT3.find('/');
+            indice_v3 = std::stoi( subT3.substr(0, pos), &sz, 10 );
+            string subN3 = subT3.substr(pos+1);
+
+            if(indice_v1 < 0) {
+                indice_v1 = listaTexturas.size() + indice_v1;
+            }
+            if(indice_v2 < 0) {
+                indice_v2 = listaTexturas.size() + indice_v2;
+            }
+            if(indice_v3 < 0) {
+                indice_v3 = listaTexturas.size() + indice_v3;
+            }
+
+            vertice * vt1 = new vertice(listaTexturas[indice_v1].x, listaTexturas[indice_v1].y, listaTexturas[indice_v1].z);
+            vertice * vt2 = new vertice(listaTexturas[indice_v2].x, listaTexturas[indice_v2].y, listaTexturas[indice_v2].z);
+            vertice * vt3 = new vertice(listaTexturas[indice_v3].x, listaTexturas[indice_v3].y, listaTexturas[indice_v3].z);
+
+            face * face_tex = new face(*vt1, *vt2, *vt3);
+            obj[objs-1].texturas.push_back(*face_tex);
+
+            // ------ NORMAIS ------- //
+            pos = subN1.find('/');
+            indice_v1 = std::stoi( subN1.substr(0, pos), &sz, 10 );
+            pos = subN2.find('/');
+            indice_v2 = std::stoi( subN2.substr(0, pos), &sz, 10 );
+            pos = subN3.find('/');
+            indice_v3 = std::stoi( subN3.substr(0, pos), &sz, 10 );
+
+            if(indice_v1 < 0) {
+                indice_v1 = listaNormais.size() + indice_v1;
+            }
+            if(indice_v2 < 0) {
+                indice_v2 = listaNormais.size() + indice_v2;
+            }
+            if(indice_v3 < 0) {
+                indice_v3 = listaNormais.size() + indice_v3;
+            }
+
+            vertice * vn1 = new vertice(listaNormais[indice_v1].x, listaNormais[indice_v1].y, listaNormais[indice_v1].z);
+            vertice * vn2 = new vertice(listaNormais[indice_v2].x, listaNormais[indice_v2].y, listaNormais[indice_v2].z);
+            vertice * vn3 = new vertice(listaNormais[indice_v3].x, listaNormais[indice_v3].y, listaNormais[indice_v3].z);
+
+            face * face_nor = new face(*vn1, *vn2, *vn3);
+            obj[objs-1].normais.push_back(*face_nor);
 
 		}
 
@@ -649,6 +597,7 @@ void display(){
     focus[0],focus[1],focus[2],                           // ponto de interesse (foco)
     up[0],up[1],up[2]);                          // vetor de "view up"
     glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_LIGHTING);
     desenhaEixos();
 
     glDisable(GL_BLEND);
@@ -656,7 +605,6 @@ void display(){
         if(importado[i] == true){
             glEnable(GL_CULL_FACE);
             glCullFace(GL_FRONT);
-            glBindTexture(GL_TEXTURE_2D, texture[0]);
             desenhaObj(i);
         }
     }
@@ -672,6 +620,7 @@ void display(){
     glViewport((LARGURA_JANELA/3)*2, 0, LARGURA_JANELA, ALTURA_JANELA);
     gluOrtho2D(0, LARGURA_JANELA/3, ALTURA_JANELA, 0);
     glMatrixMode(GL_MODELVIEW);
+    glDisable(GL_LIGHTING);
 
     desenhaMenuLateral();
 
@@ -682,7 +631,7 @@ void display(){
 void keyboardHandler(unsigned char key, int x, int y){
     if (key == 27) exit(0); //ESC
 
-   cout<< "ASCII de "<<key<< ": "<<(int)key << endl;
+   //cout<< "ASCII de "<<key<< ": "<<(int)key << endl;
 
     if(selecionado == 1){
         if(arq < 3){ //IMPEDIR USUARIO MANDAR MAIS DE 3 ARQUIVOS
@@ -739,8 +688,6 @@ void keyboardHandler(unsigned char key, int x, int y){
     }
     else{
         if (key == 'a') focus[2] -= 0.5;
-        //if (key == 's') focus[1] += 1.0;
-        //if (key == 'w') focus[1] -= 1.0;
         if (key == 'd') focus[0] -= 0.5;
         if (key == 37) focus[2] -= 1.0;
         if (key == 40) focus[1] += 1.0;
@@ -767,39 +714,6 @@ void reshape(int x, int y) {
     glutReshapeWindow(LARGURA_JANELA, ALTURA_JANELA);
 }
 
-void initTexture() {
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    Image *image1 = loadTexture();
-    if(image1 == NULL){
-        printf("Image was not returned from loadTexture\n");
-        exit(0);
-    }
-    makeCheckImage();
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    // Create Texture
-    glGenTextures(2, texture);
-    glBindTexture(GL_TEXTURE_2D, texture[0]);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); //scale linearly when image bigger than texture
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); //scale linearly when image smalled than texture
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, image1->sizeX, image1->sizeY, 0,
-                 GL_RGB, GL_UNSIGNED_BYTE, image1->data);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-
-
-    glBindTexture(GL_TEXTURE_2D, texture[1]);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, checkImageWidth,
-                 checkImageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE,&checkImage[0][0][0]);
-
-    glEnable(GL_TEXTURE_2D);
-    glShadeModel(GL_FLAT);
-}
 
 void init(){
     for(int k=0; k<3; k++){
@@ -809,7 +723,7 @@ void init(){
                 clicked[k][i][j] = 0;
         }
     }
-    glClearColor(1.0, 1.0, 1.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_COLOR_MATERIAL);
 }
 
@@ -820,8 +734,7 @@ int main(int argc, char **argv){
     glutInitWindowPosition(5, 50);
     glutCreateWindow("Blender HD");
     init();
-    initTexture();
-    initLight();
+    //initLight();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboardHandler);
     glutMouseFunc(mouseHandler);

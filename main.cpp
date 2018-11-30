@@ -255,7 +255,6 @@ Image * loadTexture(){
 
 
 void initTexture(){
-    glClearColor (0.5, 0.5, 0.5, 0.0);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     Image *image1 = loadTexture();
@@ -298,8 +297,6 @@ void initLight(void)
     GLfloat light_position[ ] = { 1.0, 1.0, 1.0, 0.0 };
     GLfloat white_light[ ] = { 1.0, 1.0, 1.0, 0.0 };
     GLfloat red_light[ ] = { 1.0, 0.0, 0.0, 0.0 };
-
-    glClearColor (1.0, 1.0, 1.0, 1.0);
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
@@ -777,6 +774,17 @@ void display(){
     glLoadIdentity();
 
     glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glViewport((LARGURA_JANELA/3)*2, 0, LARGURA_JANELA, ALTURA_JANELA);
+    gluOrtho2D(0, LARGURA_JANELA/3, ALTURA_JANELA, 0);
+    glMatrixMode(GL_MODELVIEW);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_BLEND);
+
+    desenhaMenuLateral();
+
+    glMatrixMode(GL_PROJECTION);
     glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
     glLoadIdentity();
     glFrustum(-2.0, 2.0, -2.0, 2.0, 1.0, 100.0);
@@ -789,6 +797,7 @@ void display(){
     desenhaEixos();
 
     glDisable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture[0]);
     for(int i=0; i<arq; i++){
         if(importado[i] == true){
@@ -799,19 +808,10 @@ void display(){
     }
     glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+    glDisable(GL_TEXTURE_2D);
     glColor4f(1,0.5,0.7,0.5);
     desenhaPlano();
     glFlush();
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glViewport((LARGURA_JANELA/3)*2, 0, LARGURA_JANELA, ALTURA_JANELA);
-    gluOrtho2D(0, LARGURA_JANELA/3, ALTURA_JANELA, 0);
-    glMatrixMode(GL_MODELVIEW);
-    glDisable(GL_LIGHTING);
-
-    desenhaMenuLateral();
 
     glutSwapBuffers();
     glutPostRedisplay();
@@ -922,7 +922,7 @@ void init(){
                 clicked[k][i][j] = 0;
         }
     }
-    glClearColor(1.0, 1.0, 1.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_COLOR_MATERIAL);
 }
 

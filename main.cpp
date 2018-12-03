@@ -97,6 +97,7 @@ bool clicked[3][3][4]; // 0 PARA FALSO, 1 PARA TRUE
 bool enviar = false;
 bool nomeValido = false;
 bool wire = true;
+bool luz1=true,luz2=true,luz3=true;
 unsigned short int arq = 0;
 unsigned short int selecionado = 0; // 0 PARA O OBJETO 3D, 1 PARA BARRA DE PESQUISA
 const int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
@@ -107,6 +108,7 @@ vector<vertice> listaNormais;
 vector<vertice> listaTexturas;
 GLfloat colors[6][4] = { {0.7,0.9,0.8,1.0} , {0.8,0.4,0.2,1.0}, {1.0,1.0,0.3,1.0}, {0.5,1.0,0.5,0.5},{0.3,0.4,1.0,0.5} , {1.0,0.7,1.0,0.5}};
 GLdouble viewer[] = {2.0, 2.0, 2.0};
+GLfloat viewerf[] = {2.0, 2.0, 2.0};
 GLdouble focus[] = {0.0, 0.0, 0.0};
 GLdouble up[] = {0.0, 1.0, 0.0};
 objeto obj[3];
@@ -290,29 +292,61 @@ void initTexture(){
 
 void initLight(void)
 {
+    GLfloat light0_position[ ] = { 2.0, 2.0, 0.0, 1.0 };
+    GLfloat light0_ambient [] = {0.3, 0.3, 0.3, 1.0};
+    GLfloat light0_diffuse [] = {0.3, 0.3, 0.3, 1.0};
+    GLfloat light0_specular [] = {0.3, 0.3, 0.3, 1.0};
+
+    GLfloat light1_position[ ] = { 0.0, 2.0, 0.0, 1.0 };
+    GLfloat light1_ambient [] = {0.1, 0.1, 0.1, 1.0};
+    GLfloat light1_diffuse [] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat light1_specular [] = {1.0, 1.0, 1.0, 1.0};
+
+    GLfloat light2_ambient [] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat light2_diffuse [] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat light2_specular [] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat light2_position [] = {viewerf[0], viewerf[1], viewerf[2], 1.0};
+    GLfloat spot_direction [] = {0.0,0.0,0.0};
+
+    GLfloat teto[] = { 0.0, 9.0, 0.0, 1.0 };
+    GLfloat white_light[ ] = { 1.0, 1.0, 1.0, 0.0 };
+
     GLfloat mat_ambient[ ] = { 0.0, 0.0, 1.0, 1.0 };
     GLfloat mat_diffuse[ ] = { 1.0, 0.0, 0.0, 1.0 };
     GLfloat mat_specular[ ] = { 0.0, 1.0, 1.0, 1.0 };
     GLfloat mat_shininess[ ] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_position[ ] = { 1.0, 1.0, 1.0, 0.0 };
-    GLfloat white_light[ ] = { 1.0, 1.0, 1.0, 0.0 };
-    GLfloat red_light[ ] = { 1.0, 0.0, 0.0, 0.0 };
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, white_light);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, white_light);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
 
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_COLOR_MATERIAL);
-    glDepthFunc(GL_LEQUAL);
-    glEnable(GL_DEPTH_TEST);
+    //glLightf( GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.2f );
+     glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+   glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+
+    glLightfv (GL_LIGHT1, GL_POSITION, light1_position);
+    glLightfv (GL_LIGHT1, GL_AMBIENT, light1_ambient);
+    glLightfv (GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+    glLightfv (GL_LIGHT1, GL_SPECULAR, light1_specular);
+    glLightf (GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.0);
+    glLightf (GL_LIGHT1, GL_LINEAR_ATTENUATION, 1.0);
+    glLightf (GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 1.0);
+
+    glLightfv (GL_LIGHT2, GL_AMBIENT, light2_ambient);
+    glLightfv (GL_LIGHT2, GL_DIFFUSE, light2_diffuse);
+    glLightfv (GL_LIGHT2, GL_SPECULAR, light2_specular);
+    glLightfv (GL_LIGHT2, GL_POSITION, viewerf);
+    //glLightf (GL_LIGHT2, GL_CONSTANT_ATTENUATION, 0.0);
+    glLightf (GL_LIGHT2, GL_LINEAR_ATTENUATION, 1.0);
+    //glLightf (GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.0);
+    glLightf (GL_LIGHT2, GL_SPOT_CUTOFF, 20.0);
+    glLightfv (GL_LIGHT2, GL_SPOT_DIRECTION, spot_direction);
+    glLightf (GL_LIGHT2, GL_SPOT_EXPONENT, 30.0);
+
 }
 
 void calculaFrames(){}
@@ -538,6 +572,12 @@ void tri(vertice a, vertice b, vertice c, int ind, vertice ta, vertice tb, verti
     glScalef(obj[ind].scaleX, obj[ind].scaleY, obj[ind].scaleZ);
     glRotatef(obj[ind].rotAngle, obj[ind].rotX, obj[ind].rotY, obj[ind].rotZ);
     if(!wire){
+
+        if(luz1==true)
+            glColor3f(1.0,1.0,1.0);
+        else
+            glColor3f(0.5,0.5,0.5);
+
        glBegin(GL_TRIANGLES);
             glNormal3f(na.x, na.y, na.z);
             glTexCoord3f(ta.x, ta.y, ta.z);
@@ -763,8 +803,9 @@ void mouseHandler(int button, int state, int x, int y){
                     }
                 }
             }
-            else
+            else{
                 selecionado = 0;
+            }
         }
     }
 }
@@ -782,7 +823,32 @@ void display(){
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
 
+         glDisable(GL_LIGHT1);
+          glDisable(GL_LIGHT2);
+           glDisable(GL_LIGHT3);
+              glDisable(GL_DEPTH_TEST);
+    glDisable(GL_COLOR_MATERIAL);
     desenhaMenuLateral();
+
+     glEnable(GL_LIGHTING);
+    if(luz1==true)
+        glEnable(GL_LIGHT0);
+    else
+        glDisable(GL_LIGHT0);
+    if(luz2==true)
+        glEnable(GL_LIGHT1);
+    else
+        glDisable(GL_LIGHT1);
+    if(luz3==true)
+        glEnable(GL_LIGHT2);
+    else
+        glDisable(GL_LIGHT2);
+
+
+    glEnable(GL_COLOR_MATERIAL);
+    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_DEPTH_TEST);
+
 
     glMatrixMode(GL_PROJECTION);
     glViewport(0, 0, (LARGURA_JANELA/3)*2, ALTURA_JANELA);
@@ -801,8 +867,8 @@ void display(){
     glBindTexture(GL_TEXTURE_2D, texture[0]);
     for(int i=0; i<arq; i++){
         if(importado[i] == true){
-            glEnable(GL_CULL_FACE);
-            glCullFace(GL_FRONT);
+            //glEnable(GL_CULL_FACE);
+            //glCullFace(GL_FRONT);
             desenhaObj(i);
         }
     }
@@ -822,13 +888,24 @@ void keyboardHandler(unsigned char key, int x, int y){
 
     if (key == '1')
     {
-          glEnable(GL_LIGHTING);
+        luz1= (luz1==0) ? 1 : 0;
     }
-    else if (key == '0')
+    if (key == '2')
     {
-        glDisable(GL_LIGHTING);
+        luz2= (luz2==0) ? 1 : 0;
     }
+    if (key == '3')
+    {
+        luz3= (luz3==0) ? 1 : 0;
+    }
+    if (key == '0')
+    {
 
+       luz1 = false;
+       luz2 = false;
+        luz3= false;
+
+    }
 
    //cout<< "ASCII de "<<key<< ": "<<(int)key << endl;
 
@@ -886,8 +963,8 @@ void keyboardHandler(unsigned char key, int x, int y){
         }
     }
     else{
-        if (key == 'a') focus[2] -= 0.5;
-        if (key == 'd') focus[0] -= 0.5;
+        if (key == 'a') focus[0] -= 0.5;
+        if (key == 'd') focus[2] -= 0.5;
         if (key == 37) focus[2] -= 1.0;
         if (key == 40) focus[1] += 1.0;
         if (key == 39) focus[1] -= 1.0;
@@ -895,14 +972,20 @@ void keyboardHandler(unsigned char key, int x, int y){
         if (key == 'e') wire = true; //empty
         if (key == 'f') wire = false; //full
         if (key == 's') {
-            viewer[0] -= 0.5;
-            viewer[1] -= 0.5;
-            viewer[2] -= 0.5;
-        }
-        if (key == 'w') {
             viewer[0] += 0.5;
             viewer[1] += 0.5;
             viewer[2] += 0.5;
+            viewerf[0] += 0.5;
+            viewerf[1] += 0.5;
+            viewerf[2] += 0.5;
+        }
+        if (key == 'w') {
+            viewer[0] -= 0.5;
+            viewer[1] -= 0.5;
+            viewer[2] -= 0.5;
+            viewerf[0] -= 0.5;
+            viewerf[1] -= 0.5;
+            viewerf[2] -= 0.5;
         }
 
     }

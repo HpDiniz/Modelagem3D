@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <windows.h>
 #include <stdio.h>
+#include <math.h>
 //#include "stb_image.h"
 
 using namespace std;
@@ -78,6 +79,11 @@ public:
         return *novo;
 
     }
+    void setP(GLfloat a, GLfloat b, GLfloat c){
+        x = a;
+        y = b;
+        z = c;
+    }
 
 };
 
@@ -135,13 +141,17 @@ string nomeArq, novoP = "";
 vector<vertice> listaVertices;
 vector<vertice> listaNormais;
 vector<vertice> listaTexturas;
-vertice *posicao, *direcao, *cima, direita;
+vertice posicao, direcao, cima, direita;
 GLfloat colors[6][4] = { {0.7,0.9,0.8,1.0} , {0.8,0.4,0.2,1.0}, {1.0,1.0,0.3,1.0}, {0.5,1.0,0.5,0.5},{0.3,0.4,1.0,0.5} , {1.0,0.7,1.0,0.5}};
 GLdouble viewer[] = {2.0, 2.0, 2.0};
 GLfloat viewerf[] = {2.0, 2.0, 2.0};
 GLdouble focus[] = {0.0, 0.0, 0.0};
 GLdouble up[] = {0.0, 1.0, 0.0};
+vertice topoMundo(0.0, 1.0, 0.0);
 objeto obj[3];
+GLint Xinicial, Yinicial, Zinicial;
+GLint Yaw = 0;
+GLint Pitch = 0;
 
 GLuint texture[2];
 
@@ -814,7 +824,47 @@ void leObj(string nome){
 
 }
 
+void mouseMotion(int x, int y)
+{
+/*
+    if(x - Xinicial > 0)
+        viewer[0]+=0.125;
+    if(x - Xinicial < 0)
+        viewer[0]-=0.125;
+    if(y - Yinicial > 0)
+        viewer[1]+=0.125;
+    if(y - Yinicial < 0)
+        viewer[1]-=0.125;
+*/
+    if(x - Xinicial > 0)
+        Yaw+=5;
+    if(x - Xinicial < 0)
+        Yaw-=5;
+    if(y - Yinicial > 0)
+        Pitch+=5;
+    if(y - Yinicial < 0)
+        Pitch-=5;
+
+    cout<<"Yaw"<<endl;
+
+    direcao.x = cos(Pitch) * cos(Yaw);
+    direcao.y = sin(Pitch);
+    direcao.z = cos(Pitch) * sin(Yaw);
+    direita = vetorial(topoMundo, direcao);
+    cima = vetorial(direcao, direita);
+    up[0] = cima.x;
+    up[1] = cima.y;
+    up[0] = cima.z;
+    focus[0] = posicao.x - direcao.x;
+            focus[1] = posicao.y - direcao.y;
+            //focus[2] = posicao.z - direcao.z;
+
+
+
+}
+
 void mouseHandler(int button, int state, int x, int y){
+
     cout<<"X: "<<x<<" Y: "<<y<<endl;
     if (button == GLUT_LEFT_BUTTON){
         if (state == GLUT_DOWN) {
@@ -854,9 +904,16 @@ void mouseHandler(int button, int state, int x, int y){
                 }
             }
             else{
+                Xinicial = x;
+                Yinicial = y;
+                //Zinicial = z;
                 selecionado = 0;
 
             }
+        }
+        else if (state == GLUT_UP) {
+            Xinicial = x;
+            Yinicial = y;
         }
     }
 }
@@ -1016,22 +1073,37 @@ void keyboardHandler(unsigned char key, int x, int y){
     }
     else{
         if (key == 'a') {
-            posicao = posicao - escalar(direita, 0.5);
-            viewer[0] = posicao->x;
-            viewer[1] = posicao.y;
-            viewer[2] = posicao.z;
-            viewerf[0] = posicao.x;
-            viewerf[1] = posicao.y;
-            viewerf[2] = posicao.z;
-        }
-        if (key == 'd'){
-            posicao = posicao + escalar(direita, 0.5);
+            vertice aux(direita.x*0.5, direita.y*0.5, direita.z*0.5);
+            posicao.setP(posicao.x - aux.x, posicao.y - aux.y, posicao.z - aux.z);
             viewer[0] = posicao.x;
             viewer[1] = posicao.y;
             viewer[2] = posicao.z;
             viewerf[0] = posicao.x;
             viewerf[1] = posicao.y;
             viewerf[2] = posicao.z;
+            focus[0] = posicao.x - direcao.x;
+            focus[1] = posicao.y - direcao.y;
+            focus[2] = posicao.z - direcao.z;
+            up[0] = cima.x;
+            up[1] = cima.y;
+            up[2] = cima.z;
+
+        }
+        if (key == 'd'){
+            vertice aux(direita.x*0.5, direita.y*0.5, direita.z*0.5);
+            posicao.setP(posicao.x + aux.x, posicao.y + aux.y, posicao.z + aux.z);
+            viewer[0] = posicao.x;
+            viewer[1] = posicao.y;
+            viewer[2] = posicao.z;
+            viewerf[0] = posicao.x;
+            viewerf[1] = posicao.y;
+            viewerf[2] = posicao.z;
+            focus[0] = posicao.x - direcao.x;
+            focus[1] = posicao.y - direcao.y;
+            focus[2] = posicao.z - direcao.z;
+            up[0] = cima.x;
+            up[1] = cima.y;
+            up[2] = cima.z;
         }
         if (key == 37) focus[2] -= 1.0;
         if (key == 40) focus[1] += 1.0;
@@ -1040,23 +1112,37 @@ void keyboardHandler(unsigned char key, int x, int y){
         if (key == 'e') wire = true; //empty
         if (key == 'f') wire = false; //full
         if (key == 's') {
-            posicao = posicao - escalar(direcao, 0.5);
+            vertice aux(direcao.x*0.5, direcao.y*0.5, direcao.z*0.5);
+            posicao.setP(posicao.x - aux.x, posicao.y - aux.y, posicao.z - aux.z);
             viewer[0] = posicao.x;
             viewer[1] = posicao.y;
             viewer[2] = posicao.z;
             viewerf[0] = posicao.x;
             viewerf[1] = posicao.y;
             viewerf[2] = posicao.z;
+            focus[0] = posicao.x - direcao.x;
+            focus[1] = posicao.y - direcao.y;
+            focus[2] = posicao.z - direcao.z;
+            up[0] = cima.x;
+            up[1] = cima.y;
+            up[2] = cima.z;
 
         }
         if (key == 'w') {
-            posicao = posicao + escalar(direcao, 0.5);
+            vertice aux(direcao.x*0.5, direcao.y*0.5, direcao.z*0.5);
+            posicao.setP(posicao.x + aux.x, posicao.y + aux.y, posicao.z + aux.z);
             viewer[0] = posicao.x;
             viewer[1] = posicao.y;
             viewer[2] = posicao.z;
             viewerf[0] = posicao.x;
             viewerf[1] = posicao.y;
             viewerf[2] = posicao.z;
+            focus[0] = posicao.x - direcao.x;
+            focus[1] = posicao.y - direcao.y;
+            focus[2] = posicao.z - direcao.z;
+            up[0] = cima.x;
+            up[1] = cima.y;
+            up[2] = cima.z;
         }
 
     }
@@ -1075,9 +1161,9 @@ void init(){
                 clicked[k][i][j] = 0;
         }
     }
-    posicao = new vertice(0,0,10);
-    cima = new vertice(0,1,0);
-    direcao = new vertice(0,0,1);
+    posicao.setP(0,0,10);
+    cima.setP(0,1,0);
+    direcao.setP(0,0,1);
     direita = vetorial(cima,direcao);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_COLOR_MATERIAL);
@@ -1095,6 +1181,7 @@ int main(int argc, char **argv){
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboardHandler);
     glutMouseFunc(mouseHandler);
+    glutMotionFunc(mouseMotion);
     glutReshapeFunc(reshape);
 
     glEnable(GL_DEPTH_TEST);

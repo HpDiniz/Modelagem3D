@@ -93,6 +93,8 @@ public:
     vertice * dois;
     vertice * tres;
     vector<vertice> pontos;
+    vector<vertice> tex;
+    vector<vertice> nor;
 
     face(){}
     face(vertice a, vertice b, vertice c){
@@ -182,22 +184,6 @@ void makeCheckImage(void){
         }
     }
 }
-
-/*
-void makeCheckImage(void){
-    int i, j, c=1;
-    for (i = 0; i < checkImageWidth; i++) {
-        if (i % 8 == 0) c = !c;
-        for (j = 0; j < checkImageHeight; j++) {
-            if (j % 8 == 0) c = !c;
-            int ca = c * 255;
-            checkImage[i][j][0] = (GLubyte) ca;
-            checkImage[i][j][1] = (GLubyte) ca;
-            checkImage[i][j][2] = (GLubyte) ca;
-        }
-    }
-}
-*/
 
 vertice vetorial(vertice a, vertice b){
     vertice *hg = new vertice(a.y*b.z - a.z * b.y, a.z*b.x - a.x * b.z  , a.x*b.y - a.y * b.x );
@@ -744,6 +730,14 @@ void leOBJ(string nome){
         }
         else if(line[0]=='v' && line[1]=='t'){
             //cout << "textura\n";
+            int comeco = 3;
+            size_t posi = line.find(' ', comeco);
+            int coord = 0;
+            float coordenadas[3];
+            coordenadas[0] = stof(line.substr(comeco, posi-comeco), &sz);
+            coordenadas[1] = stof(line.substr(posi+1), &sz);
+
+            listaTexturas.push_back(vertice(coordenadas[0], coordenadas[1], 0));
 
 
         }
@@ -835,6 +829,7 @@ void leOBJ(string nome){
 
             }
 
+            /*
             for(v:v_index){
                 if(v<0) v = listaVertices.size() + v;
                 else v--;
@@ -846,6 +841,28 @@ void leOBJ(string nome){
             face_aux.pontos.clear();
             //cout << objs << endl;
 
+            for(v:t_index){
+                if(v<0) v = listaVertices.size() + v;
+                else v--;
+                //cout << listaVertices[v].x << ' ' << listaVertices[v].y <<  ' ' << listaVertices[v].z << endl;
+                face_aux.tex.push_back(vertice(listaVertices[v].x, listaVertices[v].y, listaVertices[v].z));
+
+            }
+            obj[objs-1].faces.push_back(face_aux);
+            face_aux.tex.clear();
+            //cout << objs << endl;
+
+            for(v:n_index){
+                if(v<0) v = listaVertices.size() + v;
+                else v--;
+                //cout << listaVertices[v].x << ' ' << listaVertices[v].y <<  ' ' << listaVertices[v].z << endl;
+                face_aux.nor.push_back(vertice(listaVertices[v].x, listaVertices[v].y, listaVertices[v].z));
+
+            }
+            obj[objs-1].faces.push_back(face_aux);
+            face_aux.nor.clear();
+            //cout << objs << endl;
+*/
         }
 
 

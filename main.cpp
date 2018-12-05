@@ -533,7 +533,7 @@ void submenu(int x_ini, int y_ini, int index){
         renderBitmapString(66,690,(void *)font,char2_type);
 
         stringstream ss3;
-        ss3 << FPS;
+        ss3 << FPS*2;
         std::string s3 = ss3.str ();
         char* char3_type = (char*) s3.c_str();
         renderBitmapString(22,690,(void*)font, char3_type);
@@ -947,6 +947,7 @@ void leObj(string nome){
 void mouseMotion(int x, int y)
 {
     if( x < LARGURA_JANELA - LARGURA_JANELA/3){
+            /*
         if(x - Xinicial > 0)
             viewer[0]+=0.05;
         if(x - Xinicial < 0)
@@ -954,8 +955,8 @@ void mouseMotion(int x, int y)
         if(y - Yinicial > 0)
             viewer[1]+=0.05;
         if(y - Yinicial < 0)
-            viewer[1]-=0.05;
-/*
+            viewer[1]-=0.05;  */
+
     if(x - Xinicial > 0)
         Yaw+=5;
     if(x - Xinicial < 0)
@@ -980,7 +981,7 @@ void mouseMotion(int x, int y)
     focus[1] = posicao.y - direcao.y;
     focus[2] = posicao.z - direcao.z;
 
-*/
+
     }
 }
 
@@ -1268,7 +1269,7 @@ int main(int argc, char **argv){
 		newTime = glutGet(GLUT_ELAPSED_TIME);
 		deltaTime = newTime - oldTime;
 		quadros++;
-		if(deltaTime >= 1000){
+		if(deltaTime >= 1000/2){
             FPS=quadros;
             oldTime = newTime;
             quadros = 0;

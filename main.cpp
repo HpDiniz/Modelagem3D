@@ -515,17 +515,16 @@ void submenu(int x_ini, int y_ini, int index){
         std::string s2 = ss2.str ();
         char* char2_type = (char*) s2.c_str();
         glColor3f(0.0, 0.0, 0.0);
-        renderBitmapString(44,690,(void *)font,"Faces: ");
-        glColor3f(1.0, 0.0, 0.0);
-        renderBitmapString(66,690,(void *)font,char2_type);
+        renderBitmapString(44,690,(void *)font2,"Faces: ");
+        glColor3f(1.0, 0.0, 0.4);
+        renderBitmapString(66,690,(void *)font2,char2_type);
 
         stringstream ss3;
         ss3 << FPS*2;
         std::string s3 = ss3.str ();
         char* char3_type = (char*) s3.c_str();
-        renderBitmapString(22,690,(void*)font, char3_type);
+        renderBitmapString(22,690,(void*)font2, char3_type);
         glColor3f(0.0, 0.0, 0.0);
-        renderBitmapString(5,690,(void*)font, "FPS: ");
 
 }
 

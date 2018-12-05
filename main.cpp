@@ -741,6 +741,7 @@ void leOBJ(string nome){
         }
         else if(line[0]=='f' && line[1]==' '){
             cout << "face\n";
+            vector<int> v_index, t_index, n_index;
 
             int comeco = 2;
             size_t posi = line.find(' ', comeco);
@@ -748,24 +749,67 @@ void leOBJ(string nome){
             while(posi != string::npos)
             {
                 cout << line.substr(comeco, posi-comeco) << endl;
-                char tipoFace = verificaTipoFace(line.substr(comeco, posi-comeco));
+                string string_ponto = line.substr(comeco, posi-comeco);
+                char tipoFace = verificaTipoFace(string_ponto);
                 if(tipoFace == 'v'){
-                    cout << "so vertices\n";
+
+                    v_index.push_back(stoi(string_ponto, &sz, 10));
 
                 } else if(tipoFace == 'c'){
-                    cout << "completo\n";
+
+                    size_t b1 = string_ponto.find('//', 0);
+                    size_t b2 = string_ponto.find('//', b1+1);
+                    v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
+                    t_index.push_back(stoi(string_ponto.substr(b1+1, b2-b1+1), &sz, 10));
+                    n_index.push_back(stoi(string_ponto.substr(b2+1), &sz, 10));
 
                 } else if(tipoFace == 'n'){
-                    cout << "normais\n";
+
+                    size_t b1 = string_ponto.find('//', 0);
+                    v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
+                    n_index.push_back(stoi(string_ponto.substr(b1+2), &sz, 10));
 
                 } else if(tipoFace == 't'){
-                    cout << "texturas\n";
+
+                    size_t b1 = string_ponto.find('//', 0);
+                    v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
+                    n_index.push_back(stoi(string_ponto.substr(b1+1), &sz, 10));
 
                 }
                 comeco = posi+1;
                 posi = line.find(' ',posi+1);
                 pontos++;
             }
+
+            string string_ponto = line.substr(comeco, posi-comeco);
+            char tipoFace = verificaTipoFace(string_ponto);
+            if(tipoFace == 'v'){
+
+                v_index.push_back(stoi(string_ponto, &sz, 10));
+
+            } else if(tipoFace == 'c'){
+
+                size_t b1 = string_ponto.find('//', 0);
+                size_t b2 = string_ponto.find('//', b1+1);
+                v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
+                t_index.push_back(stoi(string_ponto.substr(b1+1, b2-b1+1), &sz, 10));
+                n_index.push_back(stoi(string_ponto.substr(b2+1), &sz, 10));
+
+            } else if(tipoFace == 'n'){
+
+                size_t b1 = string_ponto.find('//', 0);
+                v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
+                n_index.push_back(stoi(string_ponto.substr(b1+2), &sz, 10));
+
+            } else if(tipoFace == 't'){
+
+                size_t b1 = string_ponto.find('//', 0);
+                v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
+                n_index.push_back(stoi(string_ponto.substr(b1+1), &sz, 10));
+
+            }
+
+
             cout << line.substr(comeco, posi-comeco) << endl;
 
         }

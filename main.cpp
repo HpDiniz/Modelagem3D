@@ -408,8 +408,6 @@ void initLight(void)
 
 }
 
-void calculaFrames(){}
-
 void renderBitmapString(float x, float y, void *font,const char *string){
     const char *c;
     glRasterPos2f(x, y);
@@ -523,6 +521,17 @@ void submenu(int x_ini, int y_ini, int index){
 
         x += x_spacer;
     }
+
+
+        stringstream ss2;
+        ss2 << num_tri;
+        std::string s2 = ss2.str ();
+        char* char2_type = (char*) s2.c_str();
+        glColor3f(0.0, 0.0, 0.0);
+        renderBitmapString(x-40,y+y_inc+450,(void *)font,"Triangulos: ");
+        glColor3f(1.0, 0.0, 0.0);
+        renderBitmapString(x+1,y+y_inc+450,(void *)font,char2_type);
+
 }
 
 void mudaParam(int j, int i, int ob, float valor){
@@ -663,7 +672,6 @@ void desenhaObj(int x) {
         tri(*obj[x].faces[i].um, *obj[x].faces[i].dois, *obj[x].faces[i].tres, x,
             *obj[x].texturas[i].um, *obj[x].texturas[i].dois, *obj[x].texturas[i].tres,
             *obj[x].normais[i].um, *obj[x].normais[i].dois, *obj[x].normais[i].tres);
-        num_tri++;
     }
 }
 
@@ -676,8 +684,114 @@ void desenhaPlano() {
 	glEnd();
 }
 
-void leObj(string nome){
+char verificaTipoFace(string str){
+    size_t posi = str.find('//', 0);
+    if(posi == string::npos) return 'v';
+    size_t barra1 = posi;
+    posi = str.find('//',posi+1);
+    if(posi-barra1 == 1) return 'n';
+    else if(posi == string::npos) return 't';
+    else return 'c';
+}
 
+void leOBJ(string nome){
+    ifstream arquivo;
+	arquivo.open(nome);
+
+	if(arquivo.fail()){
+		cerr << "Erro ao abrir arquivo." << endl;
+		exit(1);
+	}
+	listaVertices.clear();
+	obj[objs].cor[0] = colors[objs][0];
+	obj[objs].cor[1] = colors[objs][1];
+	obj[objs].cor[2] = colors[objs][2];
+	objs++;
+
+    string line;
+    std::string::size_type sz;   // alias of size_t
+
+    for (line; getline(arquivo, line); )
+    {
+        cout << "linha: " << line  << endl;
+        if(line[0]=='v' && line[1]==' '){
+            cout << "vertice\n";
+
+            int comeco = 2;
+            size_t posi = line.find(' ', comeco);
+            int coord = 0;
+            float coordenadas[3];
+            while(posi != string::npos)
+            {
+                coordenadas[coord] = stof(line.substr(comeco, posi-comeco), &sz);
+                comeco = posi+1;
+                posi = line.find(' ',posi+1);
+                coord++;
+            }
+            coordenadas[coord] = stof(line.substr(comeco, posi-comeco), &sz);
+
+            listaVertices.push_back(vertice(coordenadas[0], coordenadas[1], coordenadas[2]));
+
+        }
+        else if(line[0]=='v' && line[1]=='t'){
+            cout << "textura\n";
+        }
+        else if(line[0]=='v' && line[1]=='n'){
+            cout << "normal\n";
+        }
+        else if(line[0]=='f' && line[1]==' '){
+            cout << "face\n";
+
+            int comeco = 2;
+            size_t posi = line.find(' ', comeco);
+            int pontos = 0;
+            while(posi != string::npos)
+            {
+                cout << line.substr(comeco, posi-comeco) << endl;
+                char tipoFace = verificaTipoFace(line.substr(comeco, posi-comeco));
+                if(tipoFace == 'v'){
+                    cout << "so vertices\n";
+
+                } else if(tipoFace == 'c'){
+                    cout << "completo\n";
+
+                } else if(tipoFace == 'n'){
+                    cout << "normais\n";
+
+                } else if(tipoFace == 't'){
+                    cout << "texturas\n";
+
+                }
+                comeco = posi+1;
+                posi = line.find(' ',posi+1);
+                pontos++;
+            }
+            cout << line.substr(comeco, posi-comeco) << endl;
+
+        }
+
+
+    }
+
+
+
+    /*
+    size_t posi = line.find(' ', 0);
+    int espacos = 0, comeco = 0;
+    vector<size_t> positions;
+    while(posi != string::npos)
+    {
+        positions.push_back(posi);
+        espacos++;
+        cout << line.substr(comeco, posi) << endl;
+        posi = line.find(' ',posi+1);
+    }
+    int num_faces = espacos + 1;
+    */
+
+}
+
+void leObj(string nome){
 
     ifstream arquivo;
 
@@ -732,11 +846,8 @@ void leObj(string nome){
             listaTexturas.push_back(vertice(x, y, z));
 		}
 		else if(tipo == "f"){
-            arquivo >> s1;
-            arquivo >> s2;
-            arquivo >> s3;
-
             std::string::size_type sz;   // alias of size_t
+            num_tri++;
 
             int pos = s1.find('/');
             indice_v1 = std::stoi( s1.substr(0, pos), &sz, 10 );
@@ -818,6 +929,7 @@ void leObj(string nome){
             face * face_nor = new face(*vn1, *vn2, *vn3);
             obj[objs-1].normais.push_back(*face_nor);
 
+
 		}
 
 	}
@@ -826,16 +938,16 @@ void leObj(string nome){
 
 void mouseMotion(int x, int y)
 {
+    if( x < LARGURA_JANELA - LARGURA_JANELA/3){
+        if(x - Xinicial > 0)
+            viewer[0]+=0.05;
+        if(x - Xinicial < 0)
+            viewer[0]-=0.05;
+        if(y - Yinicial > 0)
+            viewer[1]+=0.05;
+        if(y - Yinicial < 0)
+            viewer[1]-=0.05;
 /*
-    if(x - Xinicial > 0)
-        viewer[0]+=0.125;
-    if(x - Xinicial < 0)
-        viewer[0]-=0.125;
-    if(y - Yinicial > 0)
-        viewer[1]+=0.125;
-    if(y - Yinicial < 0)
-        viewer[1]-=0.125;
-*/
     if(x - Xinicial > 0)
         Yaw+=5;
     if(x - Xinicial < 0)
@@ -850,17 +962,18 @@ void mouseMotion(int x, int y)
     direcao.x = cos(Pitch) * cos(Yaw);
     direcao.y = sin(Pitch);
     direcao.z = cos(Pitch) * sin(Yaw);
+
     direita = vetorial(topoMundo, direcao);
     cima = vetorial(direcao, direita);
     up[0] = cima.x;
     up[1] = cima.y;
     up[0] = cima.z;
     focus[0] = posicao.x - direcao.x;
-            focus[1] = posicao.y - direcao.y;
-            //focus[2] = posicao.z - direcao.z;
+    focus[1] = posicao.y - direcao.y;
+    focus[2] = posicao.z - direcao.z;
 
-
-
+*/
+    }
 }
 
 void mouseHandler(int button, int state, int x, int y){
@@ -895,7 +1008,8 @@ void mouseHandler(int button, int state, int x, int y){
                 }
                 if(arq < 3) {
                     if(x> 804 && x<890 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR){
-                        leObj(obj[arq].nome);
+                        //leObj(obj[arq].nome);
+                        leOBJ(obj[arq].nome);
                         obj[arq].nome = obj[arq].nome;
                         importado[arq] = true;
                         arq ++;
@@ -1029,7 +1143,8 @@ void keyboardHandler(unsigned char key, int x, int y){
                 obj[arq].nome.erase(obj[arq].nome.size()-1); // APAGA ULTIMO CARACTERE DA STRIING
             }
             else if((int)key == 13){
-                leObj(obj[arq].nome);
+                //leObj(obj[arq].nome);
+                leOBJ(obj[arq].nome);
                 obj[arq].nome = obj[arq].nome;
                 importado[arq] = true;
                 arq ++;
@@ -1072,78 +1187,31 @@ void keyboardHandler(unsigned char key, int x, int y){
         }
     }
     else{
-        if (key == 'a') {
-            vertice aux(direita.x*0.5, direita.y*0.5, direita.z*0.5);
-            posicao.setP(posicao.x - aux.x, posicao.y - aux.y, posicao.z - aux.z);
-            viewer[0] = posicao.x;
-            viewer[1] = posicao.y;
-            viewer[2] = posicao.z;
-            viewerf[0] = posicao.x;
-            viewerf[1] = posicao.y;
-            viewerf[2] = posicao.z;
-            focus[0] = posicao.x - direcao.x;
-            focus[1] = posicao.y - direcao.y;
-            focus[2] = posicao.z - direcao.z;
-            up[0] = cima.x;
-            up[1] = cima.y;
-            up[2] = cima.z;
-
+        if (key == 'a' || key == 'A') {
+            focus[0] += 0.5;
         }
-        if (key == 'd'){
-            vertice aux(direita.x*0.5, direita.y*0.5, direita.z*0.5);
-            posicao.setP(posicao.x + aux.x, posicao.y + aux.y, posicao.z + aux.z);
-            viewer[0] = posicao.x;
-            viewer[1] = posicao.y;
-            viewer[2] = posicao.z;
-            viewerf[0] = posicao.x;
-            viewerf[1] = posicao.y;
-            viewerf[2] = posicao.z;
-            focus[0] = posicao.x - direcao.x;
-            focus[1] = posicao.y - direcao.y;
-            focus[2] = posicao.z - direcao.z;
-            up[0] = cima.x;
-            up[1] = cima.y;
-            up[2] = cima.z;
+        if (key == 'd'|| key == 'D') {
+            focus[0] -= 0.5;
         }
-        if (key == 37) focus[2] -= 1.0;
-        if (key == 40) focus[1] += 1.0;
-        if (key == 39) focus[1] -= 1.0;
-        if (key == 38) focus[0] -= 1.0;
         if (key == 'e') wire = true; //empty
         if (key == 'f') wire = false; //full
-        if (key == 's') {
-            vertice aux(direcao.x*0.5, direcao.y*0.5, direcao.z*0.5);
-            posicao.setP(posicao.x - aux.x, posicao.y - aux.y, posicao.z - aux.z);
-            viewer[0] = posicao.x;
-            viewer[1] = posicao.y;
-            viewer[2] = posicao.z;
-            viewerf[0] = posicao.x;
-            viewerf[1] = posicao.y;
-            viewerf[2] = posicao.z;
-            focus[0] = posicao.x - direcao.x;
-            focus[1] = posicao.y - direcao.y;
-            focus[2] = posicao.z - direcao.z;
-            up[0] = cima.x;
-            up[1] = cima.y;
-            up[2] = cima.z;
+        if (key == 's' || key == 'S') {
+            viewer[0] += 0.5;
+            viewer[1] += 0.5;
+            viewer[2] += 0.5;
+            viewerf[0] += 0.5;
+            viewerf[1] += 0.5;
+            viewerf[2] += 0.5;
+        }
+        if (key == 'w' || key == 'W' ) {
+            viewer[0] -= 0.5;
+            viewer[1] -= 0.5;
+            viewer[2] -= 0.5;
+            viewerf[0] -= 0.5;
+            viewerf[1] -= 0.5;
+            viewerf[2] -= 0.5;
+        }
 
-        }
-        if (key == 'w') {
-            vertice aux(direcao.x*0.5, direcao.y*0.5, direcao.z*0.5);
-            posicao.setP(posicao.x + aux.x, posicao.y + aux.y, posicao.z + aux.z);
-            viewer[0] = posicao.x;
-            viewer[1] = posicao.y;
-            viewer[2] = posicao.z;
-            viewerf[0] = posicao.x;
-            viewerf[1] = posicao.y;
-            viewerf[2] = posicao.z;
-            focus[0] = posicao.x - direcao.x;
-            focus[1] = posicao.y - direcao.y;
-            focus[2] = posicao.z - direcao.z;
-            up[0] = cima.x;
-            up[1] = cima.y;
-            up[2] = cima.z;
-        }
 
     }
 }

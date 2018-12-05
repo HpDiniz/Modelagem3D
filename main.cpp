@@ -102,6 +102,14 @@ public:
         dois = new vertice(b);
         tres = new vertice(c);
     }
+    face(vector<vertice> vetor){
+        cout << vetor.size() << "\nchegou:";
+        for(v:vetor) cout << " " << v.x;
+        pontos = vetor;
+        cout << "\ncopia:";
+        for(v:pontos) cout << " " << v.x;
+
+    }
 };
 
 class objeto{
@@ -130,7 +138,7 @@ public:
 };
 
 int objs = 0, num_tri = 0;
-bool importado[3];
+bool importado[4];
 GLdouble quadros, deltaTime, oldTime, newTime, FPS;
 bool clicked[3][3][4]; // 0 PARA FALSO, 1 PARA TRUE
 bool enviar = false;
@@ -152,7 +160,7 @@ GLfloat viewerf[] = {2.0, 2.0, 2.0};
 GLdouble focus[] = {0.0, 0.0, 0.0};
 GLdouble up[] = {0.0, 1.0, 0.0};
 vertice topoMundo(0.0, 1.0, 0.0);
-objeto obj[3];
+objeto obj[4];
 GLint Xinicial, Yinicial, Zinicial;
 GLint Yaw = 0;
 GLint Pitch = 0;
@@ -835,26 +843,21 @@ void leOBJ(string nome){
             cout << "face: \n";
 
             for(v:v_index){
-                if(v<0){
-                        cout << listaVertices.size() + v << ": " << listaVertices[listaVertices.size() + v].x << ','
-            << listaVertices[listaVertices.size() + v].y << ',' << listaVertices[listaVertices.size() + v].z << endl;
-
-                }
-            }             cout << "\n";
-
-
-
-            for(v:v_index){
                 if(v<0)
                     face_aux.pontos.push_back(vertice(listaVertices[listaVertices.size() + v].x, listaVertices[listaVertices.size() + v].y, listaVertices[listaVertices.size() + v].z));
                 else
                     face_aux.pontos.push_back(vertice(listaVertices[v].x, listaVertices[v].y, listaVertices[v].z));
 
-            }/*
-            obj[objs-1].faces.push_back(face_aux);
-            face_aux.pontos.clear();
-            //cout << objs << endl;
+            }
 
+            //obj[objs-1].faces = new vector<face>;
+            cout << "tam: " << face_aux.pontos.size() << endl;
+            obj[objs-1].faces.push_back(face(face_aux.pontos));
+            face_aux.pontos.clear();
+            cout<<"dentro do obj";
+            for(v:obj[objs-1].faces) cout << v.pontos[0].x << endl;
+            cout << objs << endl;
+            /*
             for(v:t_index){
                 if(v<0) v = listaVertices.size() + v;
                 else v--;

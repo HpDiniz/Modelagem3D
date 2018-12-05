@@ -128,6 +128,7 @@ public:
 
 int objs = 0, num_tri = 0;
 bool importado[3];
+GLdouble quadros, deltaTime, oldTime, newTime, FPS;
 bool clicked[3][3][4]; // 0 PARA FALSO, 1 PARA TRUE
 bool enviar = false;
 bool nomeValido = false;
@@ -522,15 +523,22 @@ void submenu(int x_ini, int y_ini, int index){
         x += x_spacer;
     }
 
-
         stringstream ss2;
         ss2 << num_tri;
         std::string s2 = ss2.str ();
         char* char2_type = (char*) s2.c_str();
         glColor3f(0.0, 0.0, 0.0);
-        renderBitmapString(x-40,y+y_inc+450,(void *)font,"Triangulos: ");
+        renderBitmapString(44,690,(void *)font,"Faces: ");
         glColor3f(1.0, 0.0, 0.0);
-        renderBitmapString(x+1,y+y_inc+450,(void *)font,char2_type);
+        renderBitmapString(66,690,(void *)font,char2_type);
+
+        stringstream ss3;
+        ss3 << FPS;
+        std::string s3 = ss3.str ();
+        char* char3_type = (char*) s3.c_str();
+        renderBitmapString(22,690,(void*)font, char3_type);
+        glColor3f(0.0, 0.0, 0.0);
+        renderBitmapString(5,690,(void*)font, "FPS: ");
 
 }
 
@@ -1253,5 +1261,19 @@ int main(int argc, char **argv){
     glutReshapeFunc(reshape);
 
     glEnable(GL_DEPTH_TEST);
-    glutMainLoop();
+
+    oldTime = glutGet(GLUT_ELAPSED_TIME);
+
+	while(true){
+		newTime = glutGet(GLUT_ELAPSED_TIME);
+		deltaTime = newTime - oldTime;
+		quadros++;
+		if(deltaTime >= 1000){
+            FPS=quadros;
+            oldTime = newTime;
+            quadros = 0;
+		}
+        glutMainLoopEvent();
+	}
+
 }

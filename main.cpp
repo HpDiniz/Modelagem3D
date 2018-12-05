@@ -744,10 +744,25 @@ void leOBJ(string nome){
         }
         else if(line[0]=='v' && line[1]=='t'){
             //cout << "textura\n";
+
+
         }
         else if(line[0]=='v' && line[1]=='n'){
             //cout << "normal\n";
+            int comeco = 3;
+            size_t posi = line.find(' ', comeco);
+            int coord = 0;
+            float coordenadas[3];
+            while(posi != string::npos)
+            {
+                coordenadas[coord] = stof(line.substr(comeco, posi-comeco), &sz);
+                comeco = posi+1;
+                posi = line.find(' ',posi+1);
+                coord++;
+            }
+            coordenadas[coord] = stof(line.substr(comeco, posi-comeco), &sz);
 
+            listaNormais.push_back(vertice(coordenadas[0], coordenadas[1], coordenadas[2]));
 
         }
         else if(line[0]=='f' && line[1]==' '){
@@ -823,34 +838,18 @@ void leOBJ(string nome){
             for(v:v_index){
                 if(v<0) v = listaVertices.size() + v;
                 else v--;
-                cout << listaVertices[v].x << ' ' << listaVertices[v].y <<  ' ' << listaVertices[v].z << endl;
+                //cout << listaVertices[v].x << ' ' << listaVertices[v].y <<  ' ' << listaVertices[v].z << endl;
                 face_aux.pontos.push_back(vertice(listaVertices[v].x, listaVertices[v].y, listaVertices[v].z));
 
             }
             obj[objs-1].faces.push_back(face_aux);
             face_aux.pontos.clear();
-            cout << objs << endl;
+            //cout << objs << endl;
 
         }
 
 
     }
-
-
-
-    /*
-    size_t posi = line.find(' ', 0);
-    int espacos = 0, comeco = 0;
-    vector<size_t> positions;
-    while(posi != string::npos)
-    {
-        positions.push_back(posi);
-        espacos++;
-        cout << line.substr(comeco, posi) << endl;
-        posi = line.find(' ',posi+1);
-    }
-    int num_faces = espacos + 1;
-    */
 
 }
 

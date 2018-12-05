@@ -92,6 +92,7 @@ public:
     vertice * um;
     vertice * dois;
     vertice * tres;
+    vector<vertice> pontos;
 
     face(){}
     face(vertice a, vertice b, vertice c){
@@ -721,9 +722,9 @@ void leOBJ(string nome){
 
     for (line; getline(arquivo, line); )
     {
-        cout << "linha: " << line  << endl;
+        //cout << "linha: " << line  << endl;
         if(line[0]=='v' && line[1]==' '){
-            cout << "vertice\n";
+            //cout << "vertice\n";
 
             int comeco = 2;
             size_t posi = line.find(' ', comeco);
@@ -742,21 +743,23 @@ void leOBJ(string nome){
 
         }
         else if(line[0]=='v' && line[1]=='t'){
-            cout << "textura\n";
+            //cout << "textura\n";
         }
         else if(line[0]=='v' && line[1]=='n'){
-            cout << "normal\n";
+            //cout << "normal\n";
+
+
         }
         else if(line[0]=='f' && line[1]==' '){
-            cout << "face\n";
+            //cout << "face\n";
             vector<int> v_index, t_index, n_index;
+            face face_aux;
 
             int comeco = 2;
             size_t posi = line.find(' ', comeco);
             int pontos = 0;
             while(posi != string::npos)
             {
-                cout << line.substr(comeco, posi-comeco) << endl;
                 string string_ponto = line.substr(comeco, posi-comeco);
                 char tipoFace = verificaTipoFace(string_ponto);
                 if(tipoFace == 'v'){
@@ -817,8 +820,16 @@ void leOBJ(string nome){
 
             }
 
+            for(v:v_index){
+                if(v<0) v = listaVertices.size() + v;
+                else v--;
+                cout << listaVertices[v].x << ' ' << listaVertices[v].y <<  ' ' << listaVertices[v].z << endl;
+                face_aux.pontos.push_back(vertice(listaVertices[v].x, listaVertices[v].y, listaVertices[v].z));
 
-            cout << line.substr(comeco, posi-comeco) << endl;
+            }
+            obj[objs-1].faces.push_back(face_aux);
+            face_aux.pontos.clear();
+            cout << objs << endl;
 
         }
 

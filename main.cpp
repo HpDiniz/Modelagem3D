@@ -737,7 +737,9 @@ void leOBJ(string nome){
             coordenadas[1] = stof(line.substr(posi+1), &sz);
 
             listaTexturas.push_back(vertice(coordenadas[0], coordenadas[1], 0));
-
+            cout << "text: \n";
+            for(n:listaTexturas) cout << n.x << ',' << n.y << ',' << n.z << endl;
+            cout << "\n";
 
         }
         else if(line[0]=='v' && line[1]=='n'){
@@ -756,7 +758,9 @@ void leOBJ(string nome){
             coordenadas[coord] = stof(line.substr(comeco, posi-comeco), &sz);
 
             listaNormais.push_back(vertice(coordenadas[0], coordenadas[1], coordenadas[2]));
-
+            cout << "normais: \n";
+            for(n:listaNormais) cout << n.x << ',' << n.y << ',' << n.z << endl;
+            cout << "\n";
         }
         else if(line[0]=='f' && line[1]==' '){
             //cout << "face\n";
@@ -828,14 +832,25 @@ void leOBJ(string nome){
 
             }
 
-            /*
-            for(v:v_index){
-                if(v<0) v = listaVertices.size() + v;
-                else v--;
-                //cout << listaVertices[v].x << ' ' << listaVertices[v].y <<  ' ' << listaVertices[v].z << endl;
-                face_aux.pontos.push_back(vertice(listaVertices[v].x, listaVertices[v].y, listaVertices[v].z));
+            cout << "face: \n";
 
-            }
+            for(v:v_index){
+                if(v<0){
+                        cout << listaVertices.size() + v << ": " << listaVertices[listaVertices.size() + v].x << ','
+            << listaVertices[listaVertices.size() + v].y << ',' << listaVertices[listaVertices.size() + v].z << endl;
+
+                }
+            }             cout << "\n";
+
+
+
+            for(v:v_index){
+                if(v<0)
+                    face_aux.pontos.push_back(vertice(listaVertices[listaVertices.size() + v].x, listaVertices[listaVertices.size() + v].y, listaVertices[listaVertices.size() + v].z));
+                else
+                    face_aux.pontos.push_back(vertice(listaVertices[v].x, listaVertices[v].y, listaVertices[v].z));
+
+            }/*
             obj[objs-1].faces.push_back(face_aux);
             face_aux.pontos.clear();
             //cout << objs << endl;

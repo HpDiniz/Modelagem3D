@@ -682,7 +682,7 @@ void desenhaFace(int ind, vector<vertice> pontos, vector<vertice> normais, vecto
             glColor3f(1.0,1.0,1.0);
         else
             glColor3f(0.5,0.5,0.5);
-        cout << "tam n: " << normais.size() << " tam t: " << texturas.size() << endl;
+        //cout << "tam n: " << normais.size() << " tam t: " << texturas.size() << endl;
         glBegin(GL_POLYGON);
         for(int p=0, n=0, t=0; p<pontos.size(); p++, n++, t++){
             if(normais.size()!=0) glNormal3f(normais[n].x, normais[n].y, normais[n].z);
@@ -767,7 +767,9 @@ void leOBJ(string nome){
             float coordenadas[3];
             while(posi != string::npos)
             {
-                coordenadas[coord] = stof(line.substr(comeco, posi-comeco), &sz);
+                //cout << comeco << " " << posi << " " << line.substr(comeco, posi-comeco) <<  " " << line.substr(comeco, posi-comeco).size() << endl;
+                if(line.substr(comeco, posi-comeco).size()!=0)
+                    coordenadas[coord] = stof(line.substr(comeco, posi-comeco), &sz);
                 comeco = posi+1;
                 posi = line.find(' ',posi+1);
                 coord++;
@@ -793,7 +795,7 @@ void leOBJ(string nome){
 
         }
         else if(line[0]=='v' && line[1]=='n'){
-            cout << "normal\n";
+            //cout << "normal\n";
             int comeco = 3;
             size_t posi = line.find(' ', comeco);
             int coord = 0;
@@ -813,7 +815,7 @@ void leOBJ(string nome){
             //cout << "\n";
         }
         else if(line[0]=='f' && line[1]==' '){
-            cout << "face\n";
+            //cout << "face\n";
             vector<int> v_index, t_index, n_index;
             face face_aux;
             v_index.clear();
@@ -827,17 +829,21 @@ void leOBJ(string nome){
             {
                 string string_ponto = line.substr(comeco, posi-comeco);
                 char tipoFace = verificaTipoFace(string_ponto);
-                cout << "tipo face: " << tipoFace << endl;
+                //cout << "tipo face: " << tipoFace << endl;
                 if(tipoFace == 'v'){
 
                     v_index.push_back(stoi(string_ponto, &sz, 10));
 
                 } else if(tipoFace == 'c'){
 
+                    //cout << string_ponto << endl;
+
                     size_t b1 = string_ponto.find('//', 0);
                     size_t b2 = string_ponto.find('//', b1+1);
+                    //cout << string_ponto.substr(0, b1) << "  " << string_ponto.substr(b1+1, b2-(b1+1)) << " " << string_ponto.substr(b2+1) << endl;
+                    //cout << b1 << ' ' << b2-(b1+1) << endl;
                     v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
-                    t_index.push_back(stoi(string_ponto.substr(b1+1, b2-b1+1), &sz, 10));
+                    t_index.push_back(stoi(string_ponto.substr(b1+1, b2-(b1+1)), &sz, 10));
                     n_index.push_back(stoi(string_ponto.substr(b2+1), &sz, 10));
 
                 } else if(tipoFace == 'n'){
@@ -860,33 +866,37 @@ void leOBJ(string nome){
 
             string string_ponto = line.substr(comeco, posi-comeco);
             char tipoFace = verificaTipoFace(string_ponto);
-            if(tipoFace == 'v'){
 
-                v_index.push_back(stoi(string_ponto, &sz, 10));
+            if(string_ponto.size()!=0){
+                if(tipoFace == 'v'){
 
-            } else if(tipoFace == 'c'){
+                    v_index.push_back(stoi(string_ponto, &sz, 10));
 
-                size_t b1 = string_ponto.find('//', 0);
-                size_t b2 = string_ponto.find('//', b1+1);
-                v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
-                t_index.push_back(stoi(string_ponto.substr(b1+1, b2-b1+1), &sz, 10));
-                n_index.push_back(stoi(string_ponto.substr(b2+1), &sz, 10));
+                } else if(tipoFace == 'c'){
 
-            } else if(tipoFace == 'n'){
+                    size_t b1 = string_ponto.find('//', 0);
+                    size_t b2 = string_ponto.find('//', b1+1);
+                    v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
+                    t_index.push_back(stoi(string_ponto.substr(b1+1, b2-(b1+1)), &sz, 10));
+                    n_index.push_back(stoi(string_ponto.substr(b2+1), &sz, 10));
 
-                size_t b1 = string_ponto.find('//', 0);
-                v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
-                n_index.push_back(stoi(string_ponto.substr(b1+2), &sz, 10));
+                } else if(tipoFace == 'n'){
 
-            } else if(tipoFace == 't'){
+                    size_t b1 = string_ponto.find('//', 0);
+                    v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
+                    n_index.push_back(stoi(string_ponto.substr(b1+2), &sz, 10));
 
-                size_t b1 = string_ponto.find('//', 0);
-                v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
-                t_index.push_back(stoi(string_ponto.substr(b1+1), &sz, 10));
+                } else if(tipoFace == 't'){
+
+                    size_t b1 = string_ponto.find('//', 0);
+                    v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
+                    t_index.push_back(stoi(string_ponto.substr(b1+1), &sz, 10));
+
+                }
 
             }
 
-            cout << "face: \n";
+           // cout << "face: \n";
 
             for(v:v_index){
                 if(v<0)
@@ -897,10 +907,10 @@ void leOBJ(string nome){
 
             obj[objs-1].faces.push_back(face(face_aux.pontos));
             face_aux.pontos.clear();
-            cout << "li pontos\nTAM N: " << n_index.size() << endl;
+            //cout << "li pontos\nTAM N: " << n_index.size() << endl;
 
             for(v:n_index){
-                cout << v << endl;
+                //cout << v << endl;
                 if(v<0)
                     face_aux.pontos.push_back(vertice(listaNormais[listaNormais.size() + v].x, listaNormais[listaNormais.size() + v].y, listaNormais[listaNormais.size() + v].z));
                 else
@@ -912,7 +922,7 @@ void leOBJ(string nome){
                 obj[objs-1].normais.push_back(face(face_aux.pontos));
             face_aux.pontos.clear();
 
-            cout << "li normais\n";
+            //cout << "li normais\n";
 
             for(v:t_index){
                 if(v<0)
@@ -921,7 +931,7 @@ void leOBJ(string nome){
                     face_aux.pontos.push_back(vertice(listaTexturas[v].x, listaTexturas[v].y, listaTexturas[v].z));
 
             }
-            cout << "li texturas\n";
+            //cout << "li texturas\n";
 
             if(face_aux.pontos.size()!=0)
                 obj[objs-1].texturas.push_back(face(face_aux.pontos));
@@ -1237,7 +1247,7 @@ void display(){
             //glEnable(GL_CULL_FACE);
             //glCullFace(GL_FRONT);
             desenhaObj(i);
-            cout << "consegui desenhar\n";
+            //cout << "consegui desenhar\n";
         }
     }
     glDisable(GL_TEXTURE_2D);

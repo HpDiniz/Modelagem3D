@@ -103,11 +103,7 @@ public:
         tres = new vertice(c);
     }
     face(vector<vertice> vetor){
-        //cout << vetor.size() << "\nchegou:";
-        //for(v:vetor) cout << " " << v.x;
         pontos = vetor;
-        //cout << "\ncopia:";
-        //for(v:pontos) cout << " " << v.x;
 
     }
 };
@@ -337,9 +333,6 @@ void initTexture(){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    //glTexImage2D(GL_TEXTURE_2D, 0, 3, checkImageWidth,
-      //           checkImageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE,&checkImage[0][0][0]);
 
     glEnable(GL_TEXTURE_2D);
     glShadeModel(GL_SMOOTH);
@@ -682,7 +675,6 @@ void desenhaFace(int ind, vector<vertice> pontos, vector<vertice> normais, vecto
             glColor3f(1.0,1.0,1.0);
         else
             glColor3f(0.5,0.5,0.5);
-        //cout << "tam n: " << normais.size() << " tam t: " << texturas.size() << endl;
         glBegin(GL_POLYGON);
         for(int p=0, n=0, t=0; p<pontos.size(); p++, n++, t++){
             if(normais.size()!=0) glNormal3f(normais[n].x, normais[n].y, normais[n].z);
@@ -757,9 +749,7 @@ void leOBJ(string nome){
 
     for (line; getline(arquivo, line); )
     {
-        //cout << "linha: " << line  << endl;
         if(line[0]=='v' && line[1]==' '){
-            //cout << "vertice\n";
 
             int comeco = 2;
             size_t posi = line.find(' ', comeco);
@@ -767,7 +757,6 @@ void leOBJ(string nome){
             float coordenadas[3];
             while(posi != string::npos)
             {
-                //cout << comeco << " " << posi << " " << line.substr(comeco, posi-comeco) <<  " " << line.substr(comeco, posi-comeco).size() << endl;
                 if(line.substr(comeco, posi-comeco).size()!=0)
                     coordenadas[coord] = stof(line.substr(comeco, posi-comeco), &sz);
                 comeco = posi+1;
@@ -780,7 +769,6 @@ void leOBJ(string nome){
 
         }
         else if(line[0]=='v' && line[1]=='t'){
-            //cout << "textura\n";
             int comeco = 3;
             size_t posi = line.find(' ', comeco);
             int coord = 0;
@@ -789,13 +777,9 @@ void leOBJ(string nome){
             coordenadas[1] = stof(line.substr(posi+1), &sz);
 
             listaTexturas.push_back(vertice(coordenadas[0], coordenadas[1], 0));
-            //cout << "text: \n";
-            //for(n:listaTexturas) cout << n.x << ',' << n.y << ',' << n.z << endl;
-            //cout << "\n";
 
         }
         else if(line[0]=='v' && line[1]=='n'){
-            //cout << "normal\n";
             int comeco = 3;
             size_t posi = line.find(' ', comeco);
             int coord = 0;
@@ -810,12 +794,8 @@ void leOBJ(string nome){
             coordenadas[coord] = stof(line.substr(comeco, posi-comeco), &sz);
 
             listaNormais.push_back(vertice(coordenadas[0], coordenadas[1], coordenadas[2]));
-            //cout << "normais: \n";
-            //for(n:listaNormais) cout << n.x << ',' << n.y << ',' << n.z << endl;
-            //cout << "\n";
         }
         else if(line[0]=='f' && line[1]==' '){
-            //cout << "face\n";
             vector<int> v_index, t_index, n_index;
             face face_aux;
             v_index.clear();
@@ -829,19 +809,15 @@ void leOBJ(string nome){
             {
                 string string_ponto = line.substr(comeco, posi-comeco);
                 char tipoFace = verificaTipoFace(string_ponto);
-                //cout << "tipo face: " << tipoFace << endl;
                 if(tipoFace == 'v'){
 
                     v_index.push_back(stoi(string_ponto, &sz, 10));
 
                 } else if(tipoFace == 'c'){
 
-                    //cout << string_ponto << endl;
 
                     size_t b1 = string_ponto.find('//', 0);
                     size_t b2 = string_ponto.find('//', b1+1);
-                    //cout << string_ponto.substr(0, b1) << "  " << string_ponto.substr(b1+1, b2-(b1+1)) << " " << string_ponto.substr(b2+1) << endl;
-                    //cout << b1 << ' ' << b2-(b1+1) << endl;
                     v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
                     t_index.push_back(stoi(string_ponto.substr(b1+1, b2-(b1+1)), &sz, 10));
                     n_index.push_back(stoi(string_ponto.substr(b2+1), &sz, 10));
@@ -896,7 +872,6 @@ void leOBJ(string nome){
 
             }
 
-           // cout << "face: \n";
 
             for(v:v_index){
                 if(v<0)
@@ -907,10 +882,8 @@ void leOBJ(string nome){
 
             obj[objs-1].faces.push_back(face(face_aux.pontos));
             face_aux.pontos.clear();
-            //cout << "li pontos\nTAM N: " << n_index.size() << endl;
 
             for(v:n_index){
-                //cout << v << endl;
                 if(v<0)
                     face_aux.pontos.push_back(vertice(listaNormais[listaNormais.size() + v].x, listaNormais[listaNormais.size() + v].y, listaNormais[listaNormais.size() + v].z));
                 else
@@ -922,7 +895,6 @@ void leOBJ(string nome){
                 obj[objs-1].normais.push_back(face(face_aux.pontos));
             face_aux.pontos.clear();
 
-            //cout << "li normais\n";
 
             for(v:t_index){
                 if(v<0)
@@ -931,7 +903,6 @@ void leOBJ(string nome){
                     face_aux.pontos.push_back(vertice(listaTexturas[v].x, listaTexturas[v].y, listaTexturas[v].z));
 
             }
-            //cout << "li texturas\n";
 
             if(face_aux.pontos.size()!=0)
                 obj[objs-1].texturas.push_back(face(face_aux.pontos));
@@ -944,153 +915,8 @@ void leOBJ(string nome){
 
 }
 
-void leObj(string nome){
 
-    ifstream arquivo;
-
-	arquivo.open(nome);
-
-	if(arquivo.fail()){
-		cerr << "Erro ao abrir arquivo." << endl;
-		exit(1);
-	}
-	listaVertices.clear();
-	obj[objs].cor[0] = colors[objs][0];
-	obj[objs].cor[1] = colors[objs][1];
-	obj[objs].cor[2] = colors[objs][2];
-	objs++;
-
-	string tipo;
-    GLfloat x;
-	GLfloat y;
-	GLfloat z;
-
-    int indice_v1, indice_v2, indice_v3;
-    string s1, s2, s3;
-    double t1, t2, t3;
-
-	while(!arquivo.eof()){
-
-		arquivo>>tipo;
-		if(tipo == "v"){
-            arquivo>>x;
-            arquivo>>y;
-            arquivo>>z;
-
-            vertice * vertice_aux = new vertice(x, y, z);
-            listaVertices.push_back(vertice(x, y, z));
-
-		}
-		else if(tipo == "vn"){
-            arquivo>>x;
-            arquivo>>y;
-            arquivo>>z;
-
-            vertice * vertice_aux = new vertice(x, y, z);
-            listaNormais.push_back(vertice(x, y, z));
-
-		}
-		else if(tipo == "vt"){
-            arquivo>>x;
-            arquivo>>y;
-            arquivo>>z;
-
-            vertice * vertice_aux = new vertice(x, y, z);
-            listaTexturas.push_back(vertice(x, y, z));
-		}
-		else if(tipo == "f"){
-            std::string::size_type sz;   // alias of size_t
-            num_tri++;
-
-            int pos = s1.find('/');
-            indice_v1 = std::stoi( s1.substr(0, pos), &sz, 10 );
-            string subT1 = s1.substr(pos+1);
-            pos = s2.find('/');
-            indice_v2 = std::stoi( s2.substr(0, pos), &sz, 10 );
-            string subT2 = s2.substr(pos+1);
-            pos = s3.find('/');
-            indice_v3 = std::stoi( s3.substr(0, pos), &sz, 10 );
-            string subT3 = s3.substr(pos+1);
-
-            if(indice_v1 < 0) {
-                indice_v1 = listaVertices.size() + indice_v1;
-            }
-            if(indice_v2 < 0) {
-                indice_v2 = listaVertices.size() + indice_v2;
-            }
-            if(indice_v3 < 0) {
-                indice_v3 = listaVertices.size() + indice_v3;
-            }
-
-            vertice * v1 = new vertice(listaVertices[indice_v1].x, listaVertices[indice_v1].y, listaVertices[indice_v1].z);
-            vertice * v2 = new vertice(listaVertices[indice_v2].x, listaVertices[indice_v2].y, listaVertices[indice_v2].z);
-            vertice * v3 = new vertice(listaVertices[indice_v3].x, listaVertices[indice_v3].y, listaVertices[indice_v3].z);
-
-            face * face_aux = new face(*v1, *v2, *v3);
-            obj[objs-1].faces.push_back(*face_aux);
-
-            // ------ TEXTURA ------- //
-            pos = subT1.find('/');
-            indice_v1 = std::stoi( subT1.substr(0, pos), &sz, 10 );
-            string subN1 = subT1.substr(pos+1);
-            pos = subT2.find('/');
-            indice_v2 = std::stoi( subT2.substr(0, pos), &sz, 10 );
-            string subN2 = subT2.substr(pos+1);
-            pos = subT3.find('/');
-            indice_v3 = std::stoi( subT3.substr(0, pos), &sz, 10 );
-            string subN3 = subT3.substr(pos+1);
-
-            if(indice_v1 < 0) {
-                indice_v1 = listaTexturas.size() + indice_v1;
-            }
-            if(indice_v2 < 0) {
-                indice_v2 = listaTexturas.size() + indice_v2;
-            }
-            if(indice_v3 < 0) {
-                indice_v3 = listaTexturas.size() + indice_v3;
-            }
-
-            vertice * vt1 = new vertice(listaTexturas[indice_v1].x, listaTexturas[indice_v1].y, listaTexturas[indice_v1].z);
-            vertice * vt2 = new vertice(listaTexturas[indice_v2].x, listaTexturas[indice_v2].y, listaTexturas[indice_v2].z);
-            vertice * vt3 = new vertice(listaTexturas[indice_v3].x, listaTexturas[indice_v3].y, listaTexturas[indice_v3].z);
-
-            face * face_tex = new face(*vt1, *vt2, *vt3);
-            obj[objs-1].texturas.push_back(*face_tex);
-
-            // ------ NORMAIS ------- //
-            pos = subN1.find('/');
-            indice_v1 = std::stoi( subN1.substr(0, pos), &sz, 10 );
-            pos = subN2.find('/');
-            indice_v2 = std::stoi( subN2.substr(0, pos), &sz, 10 );
-            pos = subN3.find('/');
-            indice_v3 = std::stoi( subN3.substr(0, pos), &sz, 10 );
-
-            if(indice_v1 < 0) {
-                indice_v1 = listaNormais.size() + indice_v1;
-            }
-            if(indice_v2 < 0) {
-                indice_v2 = listaNormais.size() + indice_v2;
-            }
-            if(indice_v3 < 0) {
-                indice_v3 = listaNormais.size() + indice_v3;
-            }
-
-            vertice * vn1 = new vertice(listaNormais[indice_v1].x, listaNormais[indice_v1].y, listaNormais[indice_v1].z);
-            vertice * vn2 = new vertice(listaNormais[indice_v2].x, listaNormais[indice_v2].y, listaNormais[indice_v2].z);
-            vertice * vn3 = new vertice(listaNormais[indice_v3].x, listaNormais[indice_v3].y, listaNormais[indice_v3].z);
-
-            face * face_nor = new face(*vn1, *vn2, *vn3);
-            obj[objs-1].normais.push_back(*face_nor);
-
-
-		}
-
-	}
-
-}
-
-void mouseMotion(int x, int y)
-{
+void mouseMotion(int x, int y){
     if( x < LARGURA_JANELA - LARGURA_JANELA/3){
             /*
         if(x - Xinicial > 0)
@@ -1132,7 +958,7 @@ void mouseMotion(int x, int y)
 
 void mouseHandler(int button, int state, int x, int y){
 
-    cout<<"X: "<<x<<" Y: "<<y<<endl;
+    //cout<<"X: "<<x<<" Y: "<<y<<endl;
     if (button == GLUT_LEFT_BUTTON){
         if (state == GLUT_DOWN) {
             if( x > LARGURA_JANELA - LARGURA_JANELA/3){
@@ -1162,7 +988,6 @@ void mouseHandler(int button, int state, int x, int y){
                 }
                 if(arq < 3) {
                     if(x> 804 && x<890 && y>BAIXO_IMPORTAR && y<CIMA_IMPORTAR){
-                        //leObj(obj[arq].nome);
                         leOBJ(obj[arq].nome);
                         obj[arq].nome = obj[arq].nome;
                         importado[arq] = true;
@@ -1200,10 +1025,10 @@ void display(){
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
 
-         glDisable(GL_LIGHT0);
-          glDisable(GL_LIGHT1);
-           glDisable(GL_LIGHT2);
-              //glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHT0);
+    glDisable(GL_LIGHT1);
+    glDisable(GL_LIGHT2);
+
     glDisable(GL_COLOR_MATERIAL);
     desenhaMenuLateral();
 
@@ -1223,7 +1048,6 @@ void display(){
 
 
     glEnable(GL_COLOR_MATERIAL);
-    //glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
 
 
@@ -1244,10 +1068,7 @@ void display(){
     glBindTexture(GL_TEXTURE_2D, texture[0]);
     for(int i=0; i<arq; i++){
         if(importado[i] == true){
-            //glEnable(GL_CULL_FACE);
-            //glCullFace(GL_FRONT);
             desenhaObj(i);
-            //cout << "consegui desenhar\n";
         }
     }
     glDisable(GL_TEXTURE_2D);
@@ -1285,8 +1106,6 @@ void keyboardHandler(unsigned char key, int x, int y){
 
     }
 
-   //cout<< "ASCII de "<<key<< ": "<<(int)key << endl;
-
     if(selecionado == 1){
         if(arq < 3){ //IMPEDIR USUARIO MANDAR MAIS DE 3 ARQUIVOS
             if((int)key == 46 || ((int)key >= 65 && (int)key <= 90 ) || ((int)key >= 97 && (int)key <= 122 ) || ((int)key >= 48 && (int)key <= 57 )){ //Codigo ASCII apenas de letras e numeros
@@ -1298,7 +1117,6 @@ void keyboardHandler(unsigned char key, int x, int y){
                 obj[arq].nome.erase(obj[arq].nome.size()-1); // APAGA ULTIMO CARACTERE DA STRIING
             }
             else if((int)key == 13){
-                //leObj(obj[arq].nome);
                 leOBJ(obj[arq].nome);
                 obj[arq].nome = obj[arq].nome;
                 importado[arq] = true;

@@ -669,11 +669,48 @@ void tri(vertice a, vertice b, vertice c, int ind, vertice ta, vertice tb, verti
     glPopMatrix();
 }
 
+void desenhaFace(int ind, vector<vertice> pontos, vector<vertice> normais, vector<vertice> texturas){
+    glColor4f(obj[ind].cor[0], obj[ind].cor[1], obj[ind].cor[2], obj[ind].cor[3]);
+    glPushMatrix();
+    glTranslatef(obj[ind].transX, obj[ind].transY, obj[ind].transZ);
+    glScalef(obj[ind].scaleX, obj[ind].scaleY, obj[ind].scaleZ);
+    glRotatef(obj[ind].rotAngle, obj[ind].rotX, obj[ind].rotY, obj[ind].rotZ);
+
+    if(!wire){
+
+        if(luz1==true)
+            glColor3f(1.0,1.0,1.0);
+        else
+            glColor3f(0.5,0.5,0.5);
+
+        glBegin(GL_POLYGON);
+        for(int p=0, n=0, t=0; p<pontos.size(); p++, n++, t++){
+            glNormal3f(normais[n].x, normais[n].y, normais[n].z);
+            glTexCoord3f(texturas[t].x, texturas[t].y, texturas[t].z);
+            glVertex3f(pontos[p].x, pontos[p].y, pontos[p].z);
+        }
+        glEnd();
+
+
+    } else {
+        glBegin(GL_LINE_LOOP);
+        for(p:pontos){
+            glVertex3f(p.x, p.y, p.z);
+        }
+        glEnd();
+    }
+    glPopMatrix();
+
+}
+
 void desenhaObj(int x) {
+    //if(obj[x].faces.size()==3) desenhaTriangulo(obj[x].faces[0].pontos, obj[x].faces[1].pontos, obj[x].faces[2].pontos);
+
     for(int i=0; i<obj[x].faces.size(); i++){
-        tri(*obj[x].faces[i].um, *obj[x].faces[i].dois, *obj[x].faces[i].tres, x,
-            *obj[x].texturas[i].um, *obj[x].texturas[i].dois, *obj[x].texturas[i].tres,
-            *obj[x].normais[i].um, *obj[x].normais[i].dois, *obj[x].normais[i].tres);
+        desenhaFace(x, obj[x].faces[i].pontos, obj[x].normais[i].pontos, obj[x].texturas[i].pontos);
+        //tri(*obj[x].faces[i].um, *obj[x].faces[i].dois, *obj[x].faces[i].tres, x,
+          //  *obj[x].texturas[i].um, *obj[x].texturas[i].dois, *obj[x].texturas[i].tres,
+           // *obj[x].normais[i].um, *obj[x].normais[i].dois, *obj[x].normais[i].tres);
     }
 }
 
@@ -847,16 +884,33 @@ void leOBJ(string nome){
                     face_aux.pontos.push_back(vertice(listaVertices[listaVertices.size() + v].x, listaVertices[listaVertices.size() + v].y, listaVertices[listaVertices.size() + v].z));
                 else
                     face_aux.pontos.push_back(vertice(listaVertices[v].x, listaVertices[v].y, listaVertices[v].z));
+            }
+
+            obj[objs-1].faces.push_back(face(face_aux.pontos));
+            face_aux.pontos.clear();
+
+            for(v:n_index){
+                if(v<0)
+                    face_aux.pontos.push_back(vertice(listaNormais[listaNormais.size() + v].x, listaNormais[listaNormais.size() + v].y, listaNormais[listaNormais.size() + v].z));
+                else
+                    face_aux.pontos.push_back(vertice(listaNormais[v].x, listaNormais[v].y, listaNormais[v].z));
 
             }
 
-            //obj[objs-1].faces = new vector<face>;
-            cout << "tam: " << face_aux.pontos.size() << endl;
-            obj[objs-1].faces.push_back(face(face_aux.pontos));
+            obj[objs-1].normais.push_back(face(face_aux.pontos));
             face_aux.pontos.clear();
-            cout<<"dentro do obj";
-            for(v:obj[objs-1].faces) cout << v.pontos[0].x << endl;
-            cout << objs << endl;
+
+            for(v:t_index){
+                if(v<0)
+                    face_aux.pontos.push_back(vertice(listaTexturas[listaTexturas.size() + v].x, listaTexturas[listaTexturas.size() + v].y, listaTexturas[listaTexturas.size() + v].z));
+                else
+                    face_aux.pontos.push_back(vertice(listaTexturas[v].x, listaTexturas[v].y, listaTexturas[v].z));
+
+            }
+
+            obj[objs-1].texturas.push_back(face(face_aux.pontos));
+            face_aux.pontos.clear();
+
             /*
             for(v:t_index){
                 if(v<0) v = listaVertices.size() + v;

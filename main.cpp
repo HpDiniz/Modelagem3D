@@ -103,11 +103,11 @@ public:
         tres = new vertice(c);
     }
     face(vector<vertice> vetor){
-        cout << vetor.size() << "\nchegou:";
-        for(v:vetor) cout << " " << v.x;
+        //cout << vetor.size() << "\nchegou:";
+        //for(v:vetor) cout << " " << v.x;
         pontos = vetor;
-        cout << "\ncopia:";
-        for(v:pontos) cout << " " << v.x;
+        //cout << "\ncopia:";
+        //for(v:pontos) cout << " " << v.x;
 
     }
 };
@@ -682,11 +682,11 @@ void desenhaFace(int ind, vector<vertice> pontos, vector<vertice> normais, vecto
             glColor3f(1.0,1.0,1.0);
         else
             glColor3f(0.5,0.5,0.5);
-
+        cout << "tam n: " << normais.size() << " tam t: " << texturas.size() << endl;
         glBegin(GL_POLYGON);
         for(int p=0, n=0, t=0; p<pontos.size(); p++, n++, t++){
-            glNormal3f(normais[n].x, normais[n].y, normais[n].z);
-            glTexCoord3f(texturas[t].x, texturas[t].y, texturas[t].z);
+            if(normais.size()!=0) glNormal3f(normais[n].x, normais[n].y, normais[n].z);
+            if(texturas.size()!=0) glTexCoord3f(texturas[t].x, texturas[t].y, texturas[t].z);
             glVertex3f(pontos[p].x, pontos[p].y, pontos[p].z);
         }
         glEnd();
@@ -704,13 +704,16 @@ void desenhaFace(int ind, vector<vertice> pontos, vector<vertice> normais, vecto
 }
 
 void desenhaObj(int x) {
-    //if(obj[x].faces.size()==3) desenhaTriangulo(obj[x].faces[0].pontos, obj[x].faces[1].pontos, obj[x].faces[2].pontos);
 
     for(int i=0; i<obj[x].faces.size(); i++){
-        desenhaFace(x, obj[x].faces[i].pontos, obj[x].normais[i].pontos, obj[x].texturas[i].pontos);
-        //tri(*obj[x].faces[i].um, *obj[x].faces[i].dois, *obj[x].faces[i].tres, x,
-          //  *obj[x].texturas[i].um, *obj[x].texturas[i].dois, *obj[x].texturas[i].tres,
-           // *obj[x].normais[i].um, *obj[x].normais[i].dois, *obj[x].normais[i].tres);
+        vector<vertice> aux;
+        aux.clear();
+        if(obj[x].normais.size()!=0 && obj[x].texturas.size()!=0)
+            desenhaFace(x, obj[x].faces[i].pontos, obj[x].normais[i].pontos, obj[x].texturas[i].pontos);
+        else if(obj[x].normais.size()==0)
+            desenhaFace(x, obj[x].faces[i].pontos, aux, obj[x].texturas[i].pontos);
+        else if(obj[x].texturas.size()==0)
+            desenhaFace(x, obj[x].faces[i].pontos, obj[x].normais[i].pontos, aux);
     }
 }
 
@@ -742,6 +745,8 @@ void leOBJ(string nome){
 		exit(1);
 	}
 	listaVertices.clear();
+	listaNormais.clear();
+	listaTexturas.clear();
 	obj[objs].cor[0] = colors[objs][0];
 	obj[objs].cor[1] = colors[objs][1];
 	obj[objs].cor[2] = colors[objs][2];
@@ -782,13 +787,13 @@ void leOBJ(string nome){
             coordenadas[1] = stof(line.substr(posi+1), &sz);
 
             listaTexturas.push_back(vertice(coordenadas[0], coordenadas[1], 0));
-            cout << "text: \n";
-            for(n:listaTexturas) cout << n.x << ',' << n.y << ',' << n.z << endl;
-            cout << "\n";
+            //cout << "text: \n";
+            //for(n:listaTexturas) cout << n.x << ',' << n.y << ',' << n.z << endl;
+            //cout << "\n";
 
         }
         else if(line[0]=='v' && line[1]=='n'){
-            //cout << "normal\n";
+            cout << "normal\n";
             int comeco = 3;
             size_t posi = line.find(' ', comeco);
             int coord = 0;
@@ -803,14 +808,17 @@ void leOBJ(string nome){
             coordenadas[coord] = stof(line.substr(comeco, posi-comeco), &sz);
 
             listaNormais.push_back(vertice(coordenadas[0], coordenadas[1], coordenadas[2]));
-            cout << "normais: \n";
-            for(n:listaNormais) cout << n.x << ',' << n.y << ',' << n.z << endl;
-            cout << "\n";
+            //cout << "normais: \n";
+            //for(n:listaNormais) cout << n.x << ',' << n.y << ',' << n.z << endl;
+            //cout << "\n";
         }
         else if(line[0]=='f' && line[1]==' '){
-            //cout << "face\n";
+            cout << "face\n";
             vector<int> v_index, t_index, n_index;
             face face_aux;
+            v_index.clear();
+            t_index.clear();
+            n_index.clear();
 
             int comeco = 2;
             size_t posi = line.find(' ', comeco);
@@ -819,6 +827,7 @@ void leOBJ(string nome){
             {
                 string string_ponto = line.substr(comeco, posi-comeco);
                 char tipoFace = verificaTipoFace(string_ponto);
+                cout << "tipo face: " << tipoFace << endl;
                 if(tipoFace == 'v'){
 
                     v_index.push_back(stoi(string_ponto, &sz, 10));
@@ -841,7 +850,7 @@ void leOBJ(string nome){
 
                     size_t b1 = string_ponto.find('//', 0);
                     v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
-                    n_index.push_back(stoi(string_ponto.substr(b1+1), &sz, 10));
+                    t_index.push_back(stoi(string_ponto.substr(b1+1), &sz, 10));
 
                 }
                 comeco = posi+1;
@@ -873,7 +882,7 @@ void leOBJ(string nome){
 
                 size_t b1 = string_ponto.find('//', 0);
                 v_index.push_back(stoi(string_ponto.substr(0, b1), &sz, 10));
-                n_index.push_back(stoi(string_ponto.substr(b1+1), &sz, 10));
+                t_index.push_back(stoi(string_ponto.substr(b1+1), &sz, 10));
 
             }
 
@@ -888,8 +897,10 @@ void leOBJ(string nome){
 
             obj[objs-1].faces.push_back(face(face_aux.pontos));
             face_aux.pontos.clear();
+            cout << "li pontos\nTAM N: " << n_index.size() << endl;
 
             for(v:n_index){
+                cout << v << endl;
                 if(v<0)
                     face_aux.pontos.push_back(vertice(listaNormais[listaNormais.size() + v].x, listaNormais[listaNormais.size() + v].y, listaNormais[listaNormais.size() + v].z));
                 else
@@ -897,8 +908,11 @@ void leOBJ(string nome){
 
             }
 
-            obj[objs-1].normais.push_back(face(face_aux.pontos));
+            if(face_aux.pontos.size()!=0)
+                obj[objs-1].normais.push_back(face(face_aux.pontos));
             face_aux.pontos.clear();
+
+            cout << "li normais\n";
 
             for(v:t_index){
                 if(v<0)
@@ -907,33 +921,12 @@ void leOBJ(string nome){
                     face_aux.pontos.push_back(vertice(listaTexturas[v].x, listaTexturas[v].y, listaTexturas[v].z));
 
             }
+            cout << "li texturas\n";
 
-            obj[objs-1].texturas.push_back(face(face_aux.pontos));
+            if(face_aux.pontos.size()!=0)
+                obj[objs-1].texturas.push_back(face(face_aux.pontos));
             face_aux.pontos.clear();
 
-            /*
-            for(v:t_index){
-                if(v<0) v = listaVertices.size() + v;
-                else v--;
-                //cout << listaVertices[v].x << ' ' << listaVertices[v].y <<  ' ' << listaVertices[v].z << endl;
-                face_aux.tex.push_back(vertice(listaVertices[v].x, listaVertices[v].y, listaVertices[v].z));
-
-            }
-            obj[objs-1].faces.push_back(face_aux);
-            face_aux.tex.clear();
-            //cout << objs << endl;
-
-            for(v:n_index){
-                if(v<0) v = listaVertices.size() + v;
-                else v--;
-                //cout << listaVertices[v].x << ' ' << listaVertices[v].y <<  ' ' << listaVertices[v].z << endl;
-                face_aux.nor.push_back(vertice(listaVertices[v].x, listaVertices[v].y, listaVertices[v].z));
-
-            }
-            obj[objs-1].faces.push_back(face_aux);
-            face_aux.nor.clear();
-            //cout << objs << endl;
-*/
         }
 
 
@@ -1244,6 +1237,7 @@ void display(){
             //glEnable(GL_CULL_FACE);
             //glCullFace(GL_FRONT);
             desenhaObj(i);
+            cout << "consegui desenhar\n";
         }
     }
     glDisable(GL_TEXTURE_2D);
@@ -1260,19 +1254,19 @@ void display(){
 void keyboardHandler(unsigned char key, int x, int y){
     if (key == 27) exit(0); //ESC
 
-    if (key == '1')
+    if (key == 'b')
     {
         luz1= (luz1==0) ? 1 : 0;
     }
-    if (key == '2')
+    if (key == 'n')
     {
         luz2= (luz2==0) ? 1 : 0;
     }
-    if (key == '3')
+    if (key == 'm')
     {
         luz3= (luz3==0) ? 1 : 0;
     }
-    if (key == '0')
+    if (key == 'v')
     {
 
        luz1 = false;

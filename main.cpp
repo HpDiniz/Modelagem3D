@@ -526,6 +526,7 @@ void submenu(int x_ini, int y_ini, int index){
         char* char3_type = (char*) s3.c_str();
         renderBitmapString(22,690,(void*)font2, char3_type);
         glColor3f(0.0, 0.0, 0.0);
+        renderBitmapString(7,690,(void*)font2, "FPS:");
 
 }
 
@@ -918,7 +919,7 @@ void leOBJ(string nome){
 
 void mouseMotion(int x, int y){
     if( x < LARGURA_JANELA - LARGURA_JANELA/3){
-            /*
+
         if(x - Xinicial > 0)
             viewer[0]+=0.05;
         if(x - Xinicial < 0)
@@ -926,8 +927,8 @@ void mouseMotion(int x, int y){
         if(y - Yinicial > 0)
             viewer[1]+=0.05;
         if(y - Yinicial < 0)
-            viewer[1]-=0.05;  */
-
+            viewer[1]-=0.05;
+/*
     if(x - Xinicial > 0)
         Yaw+=5;
     if(x - Xinicial < 0)
@@ -951,7 +952,7 @@ void mouseMotion(int x, int y){
     focus[0] = posicao.x - direcao.x;
     focus[1] = posicao.y - direcao.y;
     focus[2] = posicao.z - direcao.z;
-
+*/
 
     }
 }
@@ -1084,28 +1085,6 @@ void display(){
 
 void keyboardHandler(unsigned char key, int x, int y){
     if (key == 27) exit(0); //ESC
-
-    if (key == '1')
-    {
-        luz1= (luz1==0) ? 1 : 0;
-    }
-    if (key == '2')
-    {
-        luz2= (luz2==0) ? 1 : 0;
-    }
-    if (key == '3')
-    {
-        luz3= (luz3==0) ? 1 : 0;
-    }
-    if (key == '0')
-    {
-
-       luz1 = false;
-       luz2 = false;
-       luz3 = false;
-
-    }
-
     if(selecionado == 1){
         if(arq < 3){ //IMPEDIR USUARIO MANDAR MAIS DE 3 ARQUIVOS
             if((int)key == 46 || ((int)key >= 65 && (int)key <= 90 ) || ((int)key >= 97 && (int)key <= 122 ) || ((int)key >= 48 && (int)key <= 57 )){ //Codigo ASCII apenas de letras e numeros
@@ -1160,6 +1139,27 @@ void keyboardHandler(unsigned char key, int x, int y){
         }
     }
     else{
+        if (key == '1')
+        {
+            luz1= (luz1==0) ? 1 : 0;
+        }
+        if (key == '2')
+        {
+            luz2= (luz2==0) ? 1 : 0;
+        }
+        if (key == '3')
+        {
+            luz3= (luz3==0) ? 1 : 0;
+        }
+        if (key == '0')
+        {
+
+           luz1 = false;
+           luz2 = false;
+           luz3 = false;
+
+        }
+
         if (key == 'a' || key == 'A') {
             focus[0] += 0.5;
         }

@@ -1085,19 +1085,19 @@ void display(){
 void keyboardHandler(unsigned char key, int x, int y){
     if (key == 27) exit(0); //ESC
 
-    if (key == 'b')
+    if (key == '1')
     {
         luz1= (luz1==0) ? 1 : 0;
     }
-    if (key == 'n')
+    if (key == '2')
     {
         luz2= (luz2==0) ? 1 : 0;
     }
-    if (key == 'm')
+    if (key == '3')
     {
         luz3= (luz3==0) ? 1 : 0;
     }
-    if (key == 'v')
+    if (key == '0')
     {
 
        luz1 = false;
